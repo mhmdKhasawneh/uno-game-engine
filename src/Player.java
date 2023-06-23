@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 public class Player {
     private String name;
     private int score;
@@ -30,12 +27,11 @@ public class Player {
     public List<Card> getHand() {
         return hand;
     }
-    public void drawFromDeck(Deck deck) throws InterruptedException {
-        System.out.println("Drawing a card...");
-        Thread.sleep(1000);
+    public void drawFromDeck(Deck deck)   {
+        System.out.println(getName() + " is drawing from deck...");
         hand.add(deck.drawTop());
     }
-    public void drawNFromDeck(Deck deck, int numToDraw) throws InterruptedException {
+    public void drawNFromDeck(Deck deck, int numToDraw)  {
         while(numToDraw-- > 0){
             drawFromDeck(deck);
         }
