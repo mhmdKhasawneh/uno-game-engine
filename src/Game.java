@@ -131,9 +131,8 @@ public abstract class Game {
         int numOfPlayers = sc.nextInt();
         checkNumOfPlayers(numOfPlayers);
         String name;
-        sc.nextLine();
         while(numOfPlayers-- > 0){
-            name = sc.nextLine();
+            name = sc.next();
             players.add(new Player(name));
         }
     }
@@ -198,8 +197,6 @@ public abstract class Game {
         int choice = sc.nextInt();
         player.playCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
-        setNextPlayableColor(playableCards.get(choice-1).getColor());
-        setNextPlayableFaceValue(playableCards.get(choice-1).getFaceValue());
     }
 
     private int maxScore(){
@@ -238,6 +235,7 @@ public abstract class Game {
         deckInitStrategy.initializeDeck(deck);
         deck.shuffle();
         while(true) {
+            //TODO: deal strategy is determining dealer, then dealing. first person to go is left of dealer.
             dealStrategy.deal(this);
             discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
             setNextPlayableColor(getLastDiscardedCard().getColor());
@@ -249,12 +247,8 @@ public abstract class Game {
                 displayHand(getCurrentPlayer());
                 promptPlayerTurn(getCurrentPlayer());
                 nextPlayerTurn();
-                // TODO: Try fixing this whole if else block..
-                if (getLastDiscardedCard() instanceof AbstractWildCard) {
-                    ((AbstractWildCard) getLastDiscardedCard()).performAction(this);
-                } else if (getLastDiscardedCard() instanceof AbstractActionCard) {
-                    ((AbstractActionCard) getLastDiscardedCard()).performAction(this);
-                }
+                //TODO: Look into penalties for previous player...
+                getLastDiscardedCard().performAction(this);
             }
             scoreComputationStrategy.computeScore(players, lastRoundWinner);
             if(maxScore() < winnerScore){

@@ -18,4 +18,6 @@ public abstract class Card {
     public void setScore(int score) {
         this.score = score;
     }
+    public abstract void performAction(Game game);
+
 }

@@ -3,4 +3,10 @@ public class NumberedCard extends Card{
         super(color, faceValue);
         setScore(score);
     }
+
+    @Override
+    public void performAction(Game game) {
+        game.setNextPlayableColor(getColor());
+        game.setNextPlayableFaceValue(getFaceValue());
+    }
 }

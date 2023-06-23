@@ -4,5 +4,4 @@ public abstract class AbstractActionCard extends Card {
         setScore(20);
     }
 
-    public abstract void performAction(Game game);
 }

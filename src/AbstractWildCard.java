@@ -6,8 +6,6 @@ public abstract class AbstractWildCard extends Card{
         setScore(50);
     }
 
-    public abstract void performAction(Game game);
-
     public void changeNextPlayableColor(Game game){
         Scanner sc = new Scanner(System.in);
         System.out.println("What color do you want to change to?");
@@ -22,6 +20,7 @@ public abstract class AbstractWildCard extends Card{
             System.out.println("Enter a valid color");
             newColor = sc.next().toUpperCase();
         }while(true);
-        game.setNextPlayableColor(sc.nextLine().toUpperCase());
+        game.setNextPlayableColor(newColor);
+        game.setNextPlayableFaceValue(null);
     }
 }
