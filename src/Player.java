@@ -44,6 +44,9 @@ public class Player {
         hand.remove(card);
         return card;
     }
+    public void shoutUno(){
+        System.out.println("UNO!");
+    }
     public void addToHand(Card card){
         hand.add(card);
     }
