@@ -6,7 +6,7 @@ public class BasicScoreComputationStrategy implements ScoreComputationStrategy{
         for(Player player : players){
             int score = 0;
             for(Card card : player.getHand()){
-                score += card.getCardScore();
+                score += card.getScore();
             }
             player.setScore(score);
         }

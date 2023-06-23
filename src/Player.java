@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Player implements Observer {
+public class Player {
     private String name;
     private int score;
     private List<Card> hand;
@@ -46,10 +46,5 @@ public class Player implements Observer {
     }
     public void addToHand(Card card){
         hand.add(card);
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
     }
 }

@@ -29,4 +29,12 @@ public class Deck {
         return card;
     }
 
+    public void show(){
+        int i=0;
+        for(Card card : deck){
+            System.out.println(card.getColor() + " " + card.getFaceValue() + " " + card.getScore());
+            i++;
+        }
+        System.out.println(i + " total cards");
+    }
 }

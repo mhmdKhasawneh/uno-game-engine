@@ -1,10 +1,9 @@
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Scanner;
 
-public abstract class Game extends Observable {
+public abstract class Game {
     private int minPlayers;
     private List<Player> players;
     private Player currentPlayer;
@@ -29,10 +28,10 @@ public abstract class Game extends Observable {
     private ScoreComputationStrategy scoreComputationStrategy;
     private DeckInitStrategy deckInitStrategy;
     private DiscardPileInitStrategy discardPileInitStrategy;
-    private ActionStrategy actionStrategy;
+    //private ActionStrategy actionStrategy;
     private GameDirection direction;
-    private IEnumCardColor nextPlayableColor;
-    private IEnumCardFaceValue nextPlayableFaceValue;
+    private String nextPlayableColor;
+    private String nextPlayableFaceValue;
 
     public Deck getDeck() {
         return deck;
@@ -66,7 +65,7 @@ public abstract class Game extends Observable {
         this.scoreComputationStrategy = new BasicScoreComputationStrategy();
         this.deckInitStrategy = new BasicDeckInitStrategy();
         this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
-        this.actionStrategy = new BasicActionStrategy();
+        //this.actionStrategy = new BasicActionStrategy();
         this.direction = GameDirection.CLOCKWISE;
         this.nextPlayableColor = null;
         this.nextPlayableFaceValue = null;
@@ -106,26 +105,20 @@ public abstract class Game extends Observable {
         this.deck = deck;
     }
 
-    public IEnumCardColor getNextPlayableColor() {
+    public String getNextPlayableColor() {
         return nextPlayableColor;
     }
 
-    public void setNextPlayableColor(IEnumCardColor nextPlayableColor) {
+    public void setNextPlayableColor(String nextPlayableColor) {
         this.nextPlayableColor = nextPlayableColor;
     }
 
-    public IEnumCardFaceValue getNextPlayableFaceValue() {
+    public String getNextPlayableFaceValue() {
         return nextPlayableFaceValue;
     }
 
-    public void setNextPlayableFaceValue(IEnumCardFaceValue nextPlayableFaceValue) {
+    public void setNextPlayableFaceValue(String nextPlayableFaceValue) {
         this.nextPlayableFaceValue = nextPlayableFaceValue;
-    }
-
-    private void setObservers(){
-        for(Player player : players){
-            addObserver(player);
-        }
     }
     private void initializePlayers(){
         Scanner sc = new Scanner(System.in);
@@ -138,15 +131,12 @@ public abstract class Game extends Observable {
             name = sc.nextLine();
             players.add(new Player(name));
         }
-        setObservers();
     }
     private void checkNumOfPlayers(int numOfPlayers){
         if(numOfPlayers < minPlayers){
             throw new IllegalArgumentException("The number of players should be equal to or greater than " + minPlayers);
         }
     }
-
-
     public void setMinNumOfPlayers(int playersRequired) {
         this.minPlayers = playersRequired;
     }
@@ -182,7 +172,7 @@ public abstract class Game extends Observable {
     private List<Card> getPlayableCards(Player player){
         List<Card> playableCards = new ArrayList<>();
         for(Card card : player.getHand()){
-            if(card.getColor().equalsIgnoreCase(nextPlayableColor.toString()) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue.toString())){
+            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase("WILD")){
                 playableCards.add(card);
             }
         }
@@ -201,8 +191,8 @@ public abstract class Game extends Observable {
         int choice = sc.nextInt();
         player.playCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
-        setNextPlayableColor(playableCards.get(choice-1).color);
-        setNextPlayableFaceValue(playableCards.get(choice-1).value);
+        setNextPlayableColor(playableCards.get(choice-1).getColor());
+        setNextPlayableFaceValue(playableCards.get(choice-1).getFaceValue());
     }
 
     //Template method
@@ -212,10 +202,19 @@ public abstract class Game extends Observable {
         deck.shuffle();
         dealStrategy.deal(this);
         discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-        setNextPlayableColor(getLastDiscardedCard().color);
-        setNextPlayableFaceValue(getLastDiscardedCard().value);
+        setNextPlayableColor(getLastDiscardedCard().getColor());
+        setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
         while(isOngoing()) {
-            actionStrategy.performAction(this); //TODO: Think of a way to divide the actions into different components.
+            // TODO: Try fixing this whole if else block...
+            if(getLastDiscardedCard() instanceof AbstractWildCard){
+                ((AbstractWildCard) getLastDiscardedCard()).performAction(this);
+            }
+            else if(getLastDiscardedCard() instanceof AbstractActionCard){
+                ((AbstractActionCard) getLastDiscardedCard()).performAction(this);
+            }
+            else{
+                nextPlayerTurn();
+            }
             System.out.println(getCurrentPlayer().getName() + "'s turn...");
             while (getPlayableCards(getCurrentPlayer()).size() == 0) {
                 getCurrentPlayer().drawFromDeck(deck);

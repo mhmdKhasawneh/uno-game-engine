@@ -1,20 +1,21 @@
-public class Card {
-    IEnumCardColor color;
-    IEnumCardFaceValue value;
-    IEnumCardScoreValue score;
-
-    public Card(IEnumCardColor color, IEnumCardFaceValue value, IEnumCardScoreValue score) {
+public abstract class Card {
+    private String color;
+    private String faceValue;
+    private int score;
+    public Card(String color, String faceValue) {
         this.color = color;
-        this.value = value;
+        this.faceValue = faceValue;
+    }
+    public final String getColor(){
+        return color;
+    }
+    public final String getFaceValue(){
+        return  faceValue;
+    }
+    public final int getScore() {
+        return score;
+    }
+    public void setScore(int score) {
         this.score = score;
-    }
-    public String getColor(){
-        return color.toString();
-    }
-    public String getFaceValue(){
-        return  value.toString();
-    }
-    public int getCardScore() {
-        return score.getCardScore();
     }
 }

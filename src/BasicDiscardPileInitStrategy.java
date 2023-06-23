@@ -6,7 +6,7 @@ public class BasicDiscardPileInitStrategy implements DiscardPileInitStrategy{
     public void initializeDiscardPile(List<Card> discardPile, Deck deck) {
         List<Card> failedCandidates = new ArrayList<>();
         Card candidate = deck.drawTop();
-        while(candidate.getColor().toString().equalsIgnoreCase(EnumBasicCardColor.WILD.toString())){
+        while(candidate instanceof AbstractActionCard || candidate instanceof AbstractWildCard){
             failedCandidates.add(candidate);
             candidate = deck.drawTop();
         }
