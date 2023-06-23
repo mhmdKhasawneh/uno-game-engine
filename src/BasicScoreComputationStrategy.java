@@ -9,6 +9,6 @@ public class BasicScoreComputationStrategy implements ScoreComputationStrategy{
                 score += card.getScore();
             }
         }
-        winner.setScore(score);
+        winner.setScore(score + winner.getScore());
     }
 }
