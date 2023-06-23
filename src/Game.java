@@ -10,6 +10,33 @@ public abstract class Game {
     private Player previousPlayer;
     private Deck deck;
     private Card lastDiscardedCard;
+    private List<Card> discardPile;
+    private DealStrategy dealStrategy;
+    private ScoreComputationStrategy scoreComputationStrategy;
+    private DeckInitStrategy deckInitStrategy;
+    private DiscardPileInitStrategy discardPileInitStrategy;
+    private GameDirection direction;
+    private String nextPlayableColor;
+    private String nextPlayableFaceValue;
+    private int currentPlayerIndex;
+    private int previousPlayerIndex;
+    private Player lastWinner;
+
+    public Game() {
+        this.minPlayers = 3;
+        this.players = new ArrayList<>();
+        this.discardPile = new ArrayList<>();
+        this.deck = new Deck();
+        this.dealStrategy = new BasicDealStrategy();
+        this.scoreComputationStrategy = new BasicScoreComputationStrategy();
+        this.deckInitStrategy = new BasicDeckInitStrategy();
+        this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
+        this.direction = GameDirection.CLOCKWISE;
+        this.nextPlayableColor = null;
+        this.nextPlayableFaceValue = null;
+        this.currentPlayerIndex = 0;
+        this.previousPlayerIndex = -1;
+    }
 
     public Card getLastDiscardedCard() {
         return discardPile.get(discardPile.size() - 1);
@@ -23,16 +50,6 @@ public abstract class Game {
         return players.get(previousPlayerIndex);
     }
 
-    private List<Card> discardPile;
-    private DealStrategy dealStrategy;
-    private ScoreComputationStrategy scoreComputationStrategy;
-    private DeckInitStrategy deckInitStrategy;
-    private DiscardPileInitStrategy discardPileInitStrategy;
-    //private ActionStrategy actionStrategy;
-    private GameDirection direction;
-    private String nextPlayableColor;
-    private String nextPlayableFaceValue;
-
     public Deck getDeck() {
         return deck;
     }
@@ -45,8 +62,6 @@ public abstract class Game {
         this.discardPile = discardPile;
     }
 
-    private int currentPlayerIndex;
-    private int previousPlayerIndex;
 
     public List<Player> getPlayers() {
         return players;
@@ -55,24 +70,6 @@ public abstract class Game {
     public void setPlayers(List<Player> players) {
         this.players = players;
     }
-
-    public Game() {
-        this.minPlayers = 3;
-        this.players = new ArrayList<>();
-        this.discardPile = new ArrayList<>();
-        this.deck = new Deck();
-        this.dealStrategy = new BasicDealStrategy();
-        this.scoreComputationStrategy = new BasicScoreComputationStrategy();
-        this.deckInitStrategy = new BasicDeckInitStrategy();
-        this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
-        //this.actionStrategy = new BasicActionStrategy();
-        this.direction = GameDirection.CLOCKWISE;
-        this.nextPlayableColor = null;
-        this.nextPlayableFaceValue = null;
-        this.currentPlayerIndex = 0;
-        this.previousPlayerIndex = -1;
-    }
-
     public void toggleDirection(){
         if(direction.toString().equals("CLOCKWISE")){
             direction = GameDirection.ANTICLOCKWISE;
@@ -153,6 +150,7 @@ public abstract class Game {
     public boolean isOngoing(){
         for(Player player : players){
             if(player.getHand().size() == 0){
+                lastWinner = player;
                 return false;
             }
         }
@@ -222,6 +220,6 @@ public abstract class Game {
             displayHand(getCurrentPlayer());
             promptPlayerTurn(getCurrentPlayer());
         }
-        scoreComputationStrategy.computeScore(players);
+        scoreComputationStrategy.computeScore(players, lastWinner);
     }
 }
