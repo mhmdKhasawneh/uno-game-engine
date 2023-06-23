@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.Scanner;
 
 public abstract class Game {
@@ -20,7 +19,9 @@ public abstract class Game {
     private String nextPlayableFaceValue;
     private int currentPlayerIndex;
     private int previousPlayerIndex;
-    private Player lastWinner;
+    private Player lastRoundWinner;
+    private Player maxScorePlayer;
+    private int winnerScore;
 
     public Game() {
         this.minPlayers = 3;
@@ -36,8 +37,15 @@ public abstract class Game {
         this.nextPlayableFaceValue = null;
         this.currentPlayerIndex = 0;
         this.previousPlayerIndex = -1;
+        this.winnerScore = 500;
+    }
+    public int getWinnerScore() {
+        return winnerScore;
     }
 
+    public void setWinnerScore(int winnerScore) {
+        this.winnerScore = winnerScore;
+    }
     public Card getLastDiscardedCard() {
         return discardPile.get(discardPile.size() - 1);
     }
@@ -150,7 +158,7 @@ public abstract class Game {
     public boolean isOngoing(){
         for(Player player : players){
             if(player.getHand().size() == 0){
-                lastWinner = player;
+                lastRoundWinner = player;
                 return false;
             }
         }
@@ -170,13 +178,14 @@ public abstract class Game {
     private List<Card> getPlayableCards(Player player){
         List<Card> playableCards = new ArrayList<>();
         for(Card card : player.getHand()){
-            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase("WILD")){
+            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase(EnumBasicCardColor.WILD.toString())){
                 playableCards.add(card);
             }
         }
         return playableCards;
     }
     private void promptPlayerTurn(Player player){
+        System.out.println(getCurrentPlayer().getName() + "'s turn...");
         System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " + getLastDiscardedCard().getFaceValue());
         System.out.println("What card would you like to play?");
         List<Card> playableCards = getPlayableCards(player);
@@ -193,33 +202,68 @@ public abstract class Game {
         setNextPlayableFaceValue(playableCards.get(choice-1).getFaceValue());
     }
 
+    private int maxScore(){
+        int maxScore = players.get(0).getScore();
+        for(Player player : players){
+            if(player.getScore() > maxScore){
+                maxScore = player.getScore();
+                maxScorePlayer = player;
+            }
+        }
+        return maxScore;
+    }
+
+    private void resetDeck(){
+        for(Player player : players){
+            for(Card card : player.getHand()){
+                deck.add(card);
+                player.getHand().remove(card);
+            }
+
+        }
+        for(Card card : discardPile){
+            deck.add(card);
+            discardPile.remove(card);
+        }
+        deck.shuffle();
+    }
+
+    private void announceFinalWinner(){
+        System.out.println("Congrats." + maxScorePlayer.getName() + " won with score " + maxScorePlayer.getScore());
+    }
+
     //Template method
-    public final void play() throws InterruptedException {
+    public final void play() {
         initializePlayers();
         deckInitStrategy.initializeDeck(deck);
         deck.shuffle();
-        dealStrategy.deal(this);
-        discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-        setNextPlayableColor(getLastDiscardedCard().getColor());
-        setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
-        while(isOngoing()) {
-            // TODO: Try fixing this whole if else block...
-            if(getLastDiscardedCard() instanceof AbstractWildCard){
-                ((AbstractWildCard) getLastDiscardedCard()).performAction(this);
+        while(true) {
+            dealStrategy.deal(this);
+            discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
+            setNextPlayableColor(getLastDiscardedCard().getColor());
+            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
+            while (isOngoing()) {
+                while (getPlayableCards(getCurrentPlayer()).size() == 0) {
+                    getCurrentPlayer().drawFromDeck(deck);
+                }
+                displayHand(getCurrentPlayer());
+                promptPlayerTurn(getCurrentPlayer());
+                nextPlayerTurn();
+                // TODO: Try fixing this whole if else block..
+                if (getLastDiscardedCard() instanceof AbstractWildCard) {
+                    ((AbstractWildCard) getLastDiscardedCard()).performAction(this);
+                } else if (getLastDiscardedCard() instanceof AbstractActionCard) {
+                    ((AbstractActionCard) getLastDiscardedCard()).performAction(this);
+                }
             }
-            else if(getLastDiscardedCard() instanceof AbstractActionCard){
-                ((AbstractActionCard) getLastDiscardedCard()).performAction(this);
+            scoreComputationStrategy.computeScore(players, lastRoundWinner);
+            if(maxScore() < winnerScore){
+                resetDeck();
             }
             else{
-                nextPlayerTurn();
+                announceFinalWinner();
+                break;
             }
-            System.out.println(getCurrentPlayer().getName() + "'s turn...");
-            while (getPlayableCards(getCurrentPlayer()).size() == 0) {
-                getCurrentPlayer().drawFromDeck(deck);
-            }
-            displayHand(getCurrentPlayer());
-            promptPlayerTurn(getCurrentPlayer());
         }
-        scoreComputationStrategy.computeScore(players, lastWinner);
     }
 }

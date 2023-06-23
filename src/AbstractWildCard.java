@@ -6,7 +6,7 @@ public abstract class AbstractWildCard extends Card{
         setScore(50);
     }
 
-    public abstract void performAction(Game game) throws InterruptedException;
+    public abstract void performAction(Game game);
 
     public void changeNextPlayableColor(Game game){
         Scanner sc = new Scanner(System.in);

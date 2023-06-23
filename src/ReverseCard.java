@@ -6,5 +6,6 @@ public class ReverseCard extends AbstractActionCard{
     public void performAction(Game game) {
         game.toggleDirection();
         game.nextPlayerTurn();
+        game.nextPlayerTurn();
     }
 }

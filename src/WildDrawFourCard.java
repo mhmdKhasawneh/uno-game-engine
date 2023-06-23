@@ -6,12 +6,9 @@ public class WildDrawFourCard extends AbstractWildCard{
     }
 
     @Override
-    public void performAction(Game game) throws InterruptedException {
-        Scanner sc = new Scanner(System.in);
-        System.out.println(game.getCurrentPlayer().getName() + ", what color do you want to change to?");
-        game.setNextPlayableColor(sc.nextLine().toUpperCase());
+    public void performAction(Game game) {
+        changeNextPlayableColor(game);
 
-        game.nextPlayerTurn();
         game.getCurrentPlayer().drawNFromDeck(game.getDeck(), 4);
         game.nextPlayerTurn();
     }

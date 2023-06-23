@@ -3,7 +3,7 @@ public class DrawTwoCard extends AbstractActionCard {
         super(color, faceValue);
     }
     @Override
-    public void performAction(Game game) throws InterruptedException {
+    public void performAction(Game game) {
         game.nextPlayerTurn();
         game.getCurrentPlayer().drawNFromDeck(game.getDeck(), 2);
         game.nextPlayerTurn();

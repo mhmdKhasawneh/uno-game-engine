@@ -6,6 +6,5 @@ public class SkipCard extends AbstractActionCard{
     @Override
     public void performAction(Game game) {
         game.nextPlayerTurn();
-        game.nextPlayerTurn();
     }
 }
