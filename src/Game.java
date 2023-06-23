@@ -7,7 +7,23 @@ import java.util.Scanner;
 public abstract class Game extends Observable {
     private int minPlayers;
     private List<Player> players;
+    private Player currentPlayer;
+    private Player previousPlayer;
     private Deck deck;
+    private Card lastDiscardedCard;
+
+    public Card getLastDiscardedCard() {
+        return discardPile.get(discardPile.size() - 1);
+    }
+
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
+
+    public Player getPreviousPlayer() {
+        return players.get(previousPlayerIndex);
+    }
+
     private List<Card> discardPile;
     private DealStrategy dealStrategy;
     private ScoreComputationStrategy scoreComputationStrategy;
@@ -173,7 +189,7 @@ public abstract class Game extends Observable {
         return playableCards;
     }
     private void promptPlayerTurn(Player player){
-        System.out.println("Top card in discard pile is " + discardPile.get(discardPile.size() - 1).getColor() + " " + discardPile.get(discardPile.size() - 1).getFaceValue());
+        System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " + getLastDiscardedCard().getFaceValue());
         System.out.println("What card would you like to play?");
         List<Card> playableCards = getPlayableCards(player);
         int i = 1;
@@ -196,16 +212,16 @@ public abstract class Game extends Observable {
         deck.shuffle();
         dealStrategy.deal(this);
         discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-        setNextPlayableColor(discardPile.get(discardPile.size() - 1).color);
-        setNextPlayableFaceValue(discardPile.get(discardPile.size() - 1).value);
+        setNextPlayableColor(getLastDiscardedCard().color);
+        setNextPlayableFaceValue(getLastDiscardedCard().value);
         while(isOngoing()) {
-            actionStrategy.performAction(this); //TODO: Think about this..
-            System.out.println(players.get(currentPlayerIndex).getName() + "'s turn...");
-            while (getPlayableCards(players.get(currentPlayerIndex)).size() == 0) {
-                players.get((currentPlayerIndex)).drawFromDeck(deck);
+            actionStrategy.performAction(this); //TODO: Think of a way to divide the actions into different components.
+            System.out.println(getCurrentPlayer().getName() + "'s turn...");
+            while (getPlayableCards(getCurrentPlayer()).size() == 0) {
+                getCurrentPlayer().drawFromDeck(deck);
             }
-            displayHand(players.get(currentPlayerIndex));
-            promptPlayerTurn(players.get(currentPlayerIndex));
+            displayHand(getCurrentPlayer());
+            promptPlayerTurn(getCurrentPlayer());
         }
         scoreComputationStrategy.computeScore(players);
     }

@@ -3,8 +3,8 @@ import java.util.Scanner;
 public class BasicActionStrategy implements ActionStrategy{
     @Override
     public void performAction(Game game) throws InterruptedException {
-        Player player = game.getPlayers().get(game.getCurrentPlayerIndex());
-        Card topDiscardPile = game.getDiscardPile().get(game.getDiscardPile().size() - 1);
+        Player player = game.getCurrentPlayer();
+        Card topDiscardPile = game.getLastDiscardedCard();
         Deck deck = game.getDeck();
 
         if(topDiscardPile.getFaceValue().equalsIgnoreCase(EnumBasicCardFaceValue.DRAW_TWO.toString())){
