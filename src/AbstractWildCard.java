@@ -12,7 +12,7 @@ public abstract class AbstractWildCard extends Card{
         String newColor = sc.next().toUpperCase();
         do{
             try{
-                EnumBasicCardColor.valueOf(newColor);
+                BasicEnumCardColor.valueOf(newColor);
                 break;
             } catch(IllegalArgumentException e){
                 System.out.println("Color chosen is invalid.");

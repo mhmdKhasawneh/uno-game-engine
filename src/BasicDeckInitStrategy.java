@@ -1,12 +1,12 @@
 public class BasicDeckInitStrategy implements DeckInitStrategy{
     @Override
     public void initializeDeck(Deck deck) {
-        for(EnumBasicCardColor color : EnumBasicCardColor.values()){
-            if(color.toString().equals(EnumBasicCardColor.WILD.toString())){
+        for(BasicEnumCardColor color : BasicEnumCardColor.values()){
+            if(color.toString().equals(BasicEnumCardColor.WILD.toString())){
                 break;
             }
             int i = 0;
-            for(EnumBasicCardFaceValue value : EnumBasicCardFaceValue.values()){
+            for(BasicEnumCardFaceValue value : BasicEnumCardFaceValue.values()){
                 if(i == 13){
                     break;
                 }
@@ -30,11 +30,11 @@ public class BasicDeckInitStrategy implements DeckInitStrategy{
                 i++;
             }
         }
-            addNof(new WildDrawFourCard(EnumBasicCardColor.WILD.toString(), EnumBasicCardFaceValue.WILD_DRAW_FOUR.toString()), deck,4);
-            addNof(new WildCard(EnumBasicCardColor.WILD.toString(), EnumBasicCardFaceValue.WILD.toString()), deck,4);
+            addNof(new WildDrawFourCard(BasicEnumCardColor.WILD.toString(), BasicEnumCardFaceValue.WILD_DRAW_FOUR.toString()), deck,4);
+            addNof(new WildCard(BasicEnumCardColor.WILD.toString(), BasicEnumCardFaceValue.WILD.toString()), deck,4);
     }
 
-    public void addNof(Card card, Deck deck, int n){
+    private void addNof(Card card, Deck deck, int n){
         while(n-- > 0){
                 deck.add(card);
         }

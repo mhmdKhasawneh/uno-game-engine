@@ -1,4 +1,4 @@
-public enum EnumBasicCardFaceValue implements IEnumCardFaceValue {
+public enum BasicEnumCardFaceValue implements IEnumCardFaceValue {
     ZERO,
     ONE,
     TWO,

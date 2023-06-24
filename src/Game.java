@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public abstract class Game {
@@ -24,6 +25,8 @@ public abstract class Game {
     private Player dealer;
     private int winnerScore;
     private int initialHandSize;
+    private int missedUnoDrawPenalty;
+    private int noPlayableCardPenalty;
 
     public Game() {
         this.minPlayers = 3;
@@ -41,6 +44,8 @@ public abstract class Game {
         this.previousPlayerIndex = -1;
         this.winnerScore = 500;
         this.initialHandSize = 7;
+        this.missedUnoDrawPenalty = 2;
+        this.noPlayableCardPenalty = 1;
     }
     public void setInitialHandSize(int initialHandSize) {
         this.initialHandSize = initialHandSize;
@@ -183,7 +188,7 @@ public abstract class Game {
     private List<Card> getPlayableCards(Player player){
         List<Card> playableCards = new ArrayList<>();
         for(Card card : player.getHand()){
-            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase(EnumBasicCardColor.WILD.toString())){
+            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase(BasicEnumCardColor.WILD.toString())){
                 playableCards.add(card);
             }
         }
@@ -203,6 +208,16 @@ public abstract class Game {
         int choice = sc.nextInt();
         player.playCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
+
+        if(player.getHand().size() == 1 && getRandomProbability() >= 0.5){
+            player.setUnoState(true);
+            player.shoutUno();
+        }
+    }
+
+    private double getRandomProbability(){
+        Random random = new Random();
+        return random.nextDouble();
     }
 
     private int maxScore(){
@@ -219,7 +234,7 @@ public abstract class Game {
     private void resetDeck(){
         for(Player player : players){
             for(Card card : player.getHand()){
-                deck.add(card);
+                deck.getDeck().add(card);
                 player.getHand().remove(card);
             }
 
@@ -250,14 +265,24 @@ public abstract class Game {
         return dealer;
     }
 
+    private boolean isUnoPenalty(){
+        return (previousPlayer.getHand().size() == 1 && !previousPlayer.isUnoState());
+    }
+
+    private void performUnoPenalty(){
+        if (getRandomProbability() >= 0.5) {
+            System.out.println(getCurrentPlayer().getName() + " found out that " + getPreviousPlayer().getName() +
+                    " did not shout UNO!. " + getPreviousPlayer().getName() + " will draw " + missedUnoDrawPenalty + " cards");
+            previousPlayer.drawNFromDeck(deck, missedUnoDrawPenalty);
+        }
+    }
     //Template method
     public final void play() {
         initializePlayers();
         deckInitStrategy.initializeDeck(deck);
         deck.shuffle();
+        dealerDeterminationStrategy.determineDealer(this);
         while(true) {
-            //TODO: determineDealer strategy is determining dealer, then dealing. first person to go is left of dealer.
-            dealerDeterminationStrategy.determineDealer(this);
             deal();
             setCurrentPlayerIndex(players.indexOf(dealer));
             nextPlayerTurn();
@@ -266,19 +291,25 @@ public abstract class Game {
             setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
             while (isOngoing()) {
                 while (getPlayableCards(getCurrentPlayer()).size() == 0) {
-                    getCurrentPlayer().drawFromDeck(deck);
+                    getCurrentPlayer().drawNFromDeck(deck, noPlayableCardPenalty);
                 }
                 displayHand(getCurrentPlayer());
                 promptPlayerTurn(getCurrentPlayer());
                 nextPlayerTurn();
-                //TODO: Look into penalties for previous player...
+                if (previousPlayer != null && isUnoPenalty()) {
+                    performUnoPenalty();
+                }
+                if (getLastDiscardedCard() instanceof IPenalty) {
+                    if (((IPenalty) getLastDiscardedCard()).performPenalty(this)) {
+                        continue;
+                    }
+                }
                 getLastDiscardedCard().performAction(this);
             }
             scoreComputationStrategy.computeScore(players, lastRoundWinner);
-            if(maxScore() < winnerScore){
+            if (maxScore() < winnerScore) {
                 resetDeck();
-            }
-            else{
+            } else {
                 announceFinalWinner();
                 break;
             }

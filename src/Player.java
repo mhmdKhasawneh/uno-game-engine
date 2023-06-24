@@ -3,10 +3,12 @@ import java.util.List;
 public class Player {
     private String name;
     private int score;
+    private boolean isUnoState;
     private List<Card> hand;
 
     public Player(String name){
         setName(name);
+        this.isUnoState = false;
         this.hand = new ArrayList<>();
     }
     public String getName() {
@@ -24,6 +26,15 @@ public class Player {
         }
         this.name = name;
     }
+
+    public boolean isUnoState() {
+        return isUnoState;
+    }
+
+    public void setUnoState(boolean unoState) {
+        isUnoState = unoState;
+    }
+
     public List<Card> getHand() {
         return hand;
     }
@@ -31,6 +42,7 @@ public class Player {
         System.out.println(getName() + " is drawing from deck...");
         Card card = deck.drawTop();
         hand.add(card);
+        this.isUnoState = false;
         return card;
     }
     public void drawNFromDeck(Deck deck, int numToDraw)  {
@@ -47,5 +59,6 @@ public class Player {
     }
     public void addToHand(Card card){
         hand.add(card);
+        this.isUnoState = false;
     }
 }
