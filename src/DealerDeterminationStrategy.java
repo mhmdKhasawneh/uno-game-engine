@@ -1,3 +1,3 @@
-public interface DealStrategy {
+public interface DealerDeterminationStrategy {
     void determineDealer(Game game);
 }

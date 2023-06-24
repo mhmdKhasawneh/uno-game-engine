@@ -10,7 +10,7 @@ public abstract class Game {
     private Deck deck;
     private Card lastDiscardedCard;
     private List<Card> discardPile;
-    private DealStrategy dealStrategy;
+    private DealerDeterminationStrategy dealerDeterminationStrategy;
     private ScoreComputationStrategy scoreComputationStrategy;
     private DeckInitStrategy deckInitStrategy;
     private DiscardPileInitStrategy discardPileInitStrategy;
@@ -21,23 +21,29 @@ public abstract class Game {
     private int previousPlayerIndex;
     private Player lastRoundWinner;
     private Player maxScorePlayer;
+    private Player dealer;
     private int winnerScore;
+    private int initialHandSize;
 
     public Game() {
         this.minPlayers = 3;
         this.players = new ArrayList<>();
         this.discardPile = new ArrayList<>();
         this.deck = new Deck();
-        this.dealStrategy = new BasicDealStrategy();
+        this.dealerDeterminationStrategy = new BasicDealerDeterminationStrategy();
         this.scoreComputationStrategy = new BasicScoreComputationStrategy();
         this.deckInitStrategy = new BasicDeckInitStrategy();
         this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
         this.direction = GameDirection.CLOCKWISE;
         this.nextPlayableColor = null;
         this.nextPlayableFaceValue = null;
-        this.currentPlayerIndex = 0;
+        this.currentPlayerIndex = -1;
         this.previousPlayerIndex = -1;
         this.winnerScore = 500;
+        this.initialHandSize = 7;
+    }
+    public void setInitialHandSize(int initialHandSize) {
+        this.initialHandSize = initialHandSize;
     }
     public int getWinnerScore() {
         return winnerScore;
@@ -93,11 +99,11 @@ public abstract class Game {
 
     public void nextPlayerTurn(){
         previousPlayerIndex = currentPlayerIndex;
-        if(direction.toString().equals("CLOCKWISE")){
-            currentPlayerIndex = ++currentPlayerIndex % players.size();
+        if(direction.toString().equals(GameDirection.CLOCKWISE.toString())){
+            currentPlayerIndex = (currentPlayerIndex + (players.size() - 1)) % players.size();
         }
         else{
-            currentPlayerIndex = (currentPlayerIndex + (players.size() - 1)) % players.size();
+            currentPlayerIndex = ++currentPlayerIndex % players.size();
         }
     }
     public void setDirection(String direction)  {
@@ -145,8 +151,8 @@ public abstract class Game {
         this.minPlayers = playersRequired;
     }
 
-    public void setDealStrategy(DealStrategy dealStrategy){
-        this.dealStrategy = dealStrategy;
+    public void setDealStrategy(DealerDeterminationStrategy dealerDeterminationStrategy){
+        this.dealerDeterminationStrategy = dealerDeterminationStrategy;
     }
     public void setScoreComputationStrategy(ScoreComputationStrategy scoreComputationStrategy){this.scoreComputationStrategy = scoreComputationStrategy;}
 
@@ -228,6 +234,21 @@ public abstract class Game {
     private void announceFinalWinner(){
         System.out.println("Congrats." + maxScorePlayer.getName() + " won with score " + maxScorePlayer.getScore());
     }
+    private void deal(){
+        for(Player player : players){
+            for(int i=1;i<=initialHandSize;i++){
+             player.addToHand(deck.drawTop());
+         }
+      }
+    }
+
+    public void setDealer(Player dealer) {
+        this.dealer = dealer;
+    }
+
+    public Player getDealer() {
+        return dealer;
+    }
 
     //Template method
     public final void play() {
@@ -235,8 +256,11 @@ public abstract class Game {
         deckInitStrategy.initializeDeck(deck);
         deck.shuffle();
         while(true) {
-            //TODO: deal strategy is determining dealer, then dealing. first person to go is left of dealer.
-            dealStrategy.deal(this);
+            //TODO: determineDealer strategy is determining dealer, then dealing. first person to go is left of dealer.
+            dealerDeterminationStrategy.determineDealer(this);
+            deal();
+            setCurrentPlayerIndex(players.indexOf(dealer));
+            nextPlayerTurn();
             discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
             setNextPlayableColor(getLastDiscardedCard().getColor());
             setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());

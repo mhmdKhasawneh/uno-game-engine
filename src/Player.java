@@ -27,9 +27,11 @@ public class Player {
     public List<Card> getHand() {
         return hand;
     }
-    public void drawFromDeck(Deck deck)   {
+    public Card drawFromDeck(Deck deck)   {
         System.out.println(getName() + " is drawing from deck...");
-        hand.add(deck.drawTop());
+        Card card = deck.drawTop();
+        hand.add(card);
+        return card;
     }
     public void drawNFromDeck(Deck deck, int numToDraw)  {
         while(numToDraw-- > 0){

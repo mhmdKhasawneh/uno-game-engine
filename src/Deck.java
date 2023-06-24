@@ -10,6 +10,11 @@ public class Deck {
         deck = new ArrayList<>();
         deckSize = 0;
     }
+
+    public int getDeckSize() {
+        return deckSize;
+    }
+
     public final List<Card> getDeck() {
         return deck;
     }
