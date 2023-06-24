@@ -4,15 +4,22 @@ import java.util.Random;
 
 public class Deck {
     private List<Card> deck;
+    private int deckSize;
 
     public Deck() {
         deck = new ArrayList<>();
+        deckSize = 0;
     }
     public final List<Card> getDeck() {
         return deck;
     }
     public void add(Card card){
         deck.add(card);
+        deckSize++;
+    }
+    public void add(int index, Card card){
+        deck.add(index, card);
+        deckSize++;
     }
     public void shuffle(){
         Random random = new Random();
@@ -26,6 +33,7 @@ public class Deck {
     public Card drawTop(){
         Card card = deck.get(deck.size() - 1);
         deck.remove(deck.size()-1);
+        deckSize--;
         return card;
     }
 
