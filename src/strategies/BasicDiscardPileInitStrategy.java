@@ -1,3 +1,10 @@
+package strategies;
+
+import cards.AbstractActionCard;
+import cards.AbstractWildCard;
+import cards.Card;
+import cards.Deck;
+
 import java.util.ArrayList;
 import java.util.List;
 

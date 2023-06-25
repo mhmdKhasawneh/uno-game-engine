@@ -1,3 +1,5 @@
+package cards;
+import game.*;
 import java.util.Scanner;
 
 public class WildDrawFourCard extends AbstractWildCard implements IPenalty{

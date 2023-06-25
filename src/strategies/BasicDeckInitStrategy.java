@@ -1,3 +1,7 @@
+package strategies;
+
+import cards.*;
+
 public class BasicDeckInitStrategy implements DeckInitStrategy{
     @Override
     public void initializeDeck(Deck deck) {

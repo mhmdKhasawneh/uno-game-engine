@@ -1,3 +1,11 @@
+package game;
+
+import cards.BasicEnumCardColor;
+import cards.Card;
+import cards.Deck;
+import cards.IPenalty;
+import strategies.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +37,7 @@ public abstract class Game {
     private int noPlayableCardPenalty;
 
     public Game() {
-        this.minPlayers = 3;
+        this.minPlayers = 2;
         this.players = new ArrayList<>();
         this.discardPile = new ArrayList<>();
         this.deck = new Deck();
@@ -97,7 +105,13 @@ public abstract class Game {
             direction = GameDirection.CLOCKWISE;
         }
     }
+    public void setMissedUnoDrawPenalty(int missedUnoDrawPenalty) {
+        this.missedUnoDrawPenalty = missedUnoDrawPenalty;
+    }
 
+    public void setNoPlayableCardPenalty(int noPlayableCardPenalty) {
+        this.noPlayableCardPenalty = noPlayableCardPenalty;
+    }
     public int getPreviousPlayerIndex() {
         return previousPlayerIndex;
     }
@@ -113,7 +127,7 @@ public abstract class Game {
     }
     public void setDirection(String direction)  {
         if(!direction.equalsIgnoreCase("CLOCKWISE") && !direction.equalsIgnoreCase("ANTICLOCKWISE")){
-            throw new IllegalArgumentException("Game direction could either be clockwise or anticlockwise");
+            throw new IllegalArgumentException("game.Game direction could either be clockwise or anticlockwise");
         }
         this.direction = GameDirection.valueOf(direction.toUpperCase());
     }
@@ -282,7 +296,7 @@ public abstract class Game {
         deckInitStrategy.initializeDeck(deck);
         deck.shuffle();
         dealerDeterminationStrategy.determineDealer(this);
-        while(true) {
+        while(maxScore() < winnerScore) {
             deal();
             setCurrentPlayerIndex(players.indexOf(dealer));
             nextPlayerTurn();
@@ -307,12 +321,7 @@ public abstract class Game {
                 getLastDiscardedCard().performAction(this);
             }
             scoreComputationStrategy.computeScore(players, lastRoundWinner);
-            if (maxScore() < winnerScore) {
-                resetDeck();
-            } else {
-                announceFinalWinner();
-                break;
-            }
         }
+        announceFinalWinner();
     }
 }

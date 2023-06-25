@@ -1,3 +1,7 @@
+package strategies;
+import game.Player;
+import cards.Card;
+
 import java.util.List;
 
 public class BasicScoreComputationStrategy implements ScoreComputationStrategy{

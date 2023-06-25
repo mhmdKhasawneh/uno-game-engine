@@ -1,3 +1,10 @@
+package strategies;
+
+import cards.Card;
+import cards.Deck;
+import cards.NumberedCard;
+import game.*;
+
 import java.util.List;
 
 public class BasicDealerDeterminationStrategy implements DealerDeterminationStrategy {

@@ -1,5 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
+package strategies;
+
+import cards.Deck;
 
 public interface DeckInitStrategy {
     public abstract void initializeDeck(Deck deck);

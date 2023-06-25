@@ -1,3 +1,5 @@
+package cards;
+import game.Game;
 import java.util.Scanner;
 
 public abstract class AbstractWildCard extends Card{
