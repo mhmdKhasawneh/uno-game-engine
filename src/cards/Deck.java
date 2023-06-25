@@ -41,7 +41,6 @@ public class Deck {
         deckSize--;
         return deck.remove(deck.size()-1);
     }
-
     public void show(){
         int i=0;
         for(Card card : deck){

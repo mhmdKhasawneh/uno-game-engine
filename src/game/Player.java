@@ -55,15 +55,15 @@ public class Player {
             drawFromDeck(deck);
         }
     }
-    public Card playCard(Card card){
+    public void addToHand(Card card){
+        hand.add(card);
+        this.isUnoState = false;
+    }
+    public Card throwCard(Card card){
         hand.remove(card);
         return card;
     }
     public void shoutUno(){
         System.out.println("UNO!");
-    }
-    public void addToHand(Card card){
-        hand.add(card);
-        this.isUnoState = false;
     }
 }

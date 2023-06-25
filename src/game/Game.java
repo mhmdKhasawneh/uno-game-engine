@@ -60,8 +60,6 @@ public abstract class Game {
             setCurrentPlayer(players.get(players.indexOf(dealer)));
             nextPlayerTurn();
             discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-//            setNextPlayableColor(getLastDiscardedCard().getColor());
-//            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
             boolean skipAction = false;
             while (isOngoing()) {
                 if(!skipAction) {
@@ -172,7 +170,7 @@ public abstract class Game {
         }
         Scanner sc = new Scanner(System.in);
         int choice = sc.nextInt();
-        player.playCard(playableCards.get(choice - 1));
+        player.throwCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
 
         Random random = new Random();
