@@ -14,7 +14,7 @@ import java.util.Scanner;
 public abstract class Game {
     private int minPlayers;
     private int currentPlayerIndex;
-    private int winnerScore;
+    private int winningScore;
     private int initialHandSize;
     private int missedUnoDrawPenalty;
     private int noPlayableCardPenalty;
@@ -45,7 +45,7 @@ public abstract class Game {
         this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
         this.direction = GameDirection.CLOCKWISE;
         this.currentPlayerIndex = -1;
-        this.winnerScore = 500;
+        this.winningScore = 500;
         this.initialHandSize = 7;
         this.missedUnoDrawPenalty = 2;
         this.noPlayableCardPenalty = 1;
@@ -60,9 +60,13 @@ public abstract class Game {
             setCurrentPlayer(players.get(players.indexOf(dealer)));
             nextPlayerTurn();
             discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-            setNextPlayableColor(getLastDiscardedCard().getColor());
-            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
+//            setNextPlayableColor(getLastDiscardedCard().getColor());
+//            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
+            boolean skipAction = false;
             while (isOngoing()) {
+                if(!skipAction) {
+                    getLastDiscardedCard().performAction(this);
+                }
                 while (getPlayableCards(getCurrentPlayer()).size() == 0) {
                     getCurrentPlayer().drawNFromDeck(deck, noPlayableCardPenalty);
                 }
@@ -74,18 +78,20 @@ public abstract class Game {
                 }
                 if (getLastDiscardedCard() instanceof IPenalty) {
                     ((IPenalty) getLastDiscardedCard()).performPenalty(this);
-                    continue;
+                    skipAction = true;
                 }
-                getLastDiscardedCard().performAction(this);
+                else{
+                    skipAction = false;
+                }
             }
             scoreComputationStrategy.computeScore(players, roundWinner);
-            if(maxScore() < winnerScore){
+            if(maxScore() < winningScore){
                 System.out.println("Round winner " + roundWinner.getName() + " has score " + roundWinner.getScore()
-                        + " which is less than " + winnerScore +
+                        + " which is less than " + winningScore +
                         ". starting another round...");
                 resetGameDeck();
             }
-        } while(maxScore() < winnerScore);
+        } while(maxScore() < winningScore);
         announceFinalWinner();
     }
     private void initializePlayers(){
@@ -265,8 +271,8 @@ public abstract class Game {
         this.minPlayers = minPlayers;
     }
 
-    public void setWinnerScore(int winnerScore) {
-        this.winnerScore = winnerScore;
+    public void setWinningScore(int winningScore) {
+        this.winningScore = winningScore;
     }
 
     public void setInitialHandSize(int initialHandSize) {
