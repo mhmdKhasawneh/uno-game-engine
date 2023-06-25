@@ -6,13 +6,13 @@ import java.util.List;
 
 public class BasicScoreComputationStrategy implements ScoreComputationStrategy{
     @Override
-    public void computeScore(List<Player> players, Player winner){
+    public void computeScore(List<Player> players, Player roundWinner){
         int score = 0;
         for(Player player : players){
             for(Card card : player.getHand()){
                 score += card.getScore();
             }
         }
-        winner.setScore(score + winner.getScore());
+        roundWinner.setScore(score + roundWinner.getScore());
     }
 }

@@ -13,17 +13,20 @@ public class BasicDealerDeterminationStrategy implements DealerDeterminationStra
         System.out.println("Determining dealer...");
         List<Player> players = game.getPlayers();
         Deck deck = game.getDeck();
-        int maxScore = 0;
+        int maxScore = -1;
         for(Player player : players){
             Card drawnCard = player.drawFromDeck(deck);
             while(!(drawnCard instanceof NumberedCard)){
                 deck.add(deck.getDeckSize()/2, drawnCard);
+                player.playCard(drawnCard);
                 drawnCard = player.drawFromDeck(deck);
             }
             if(drawnCard.getScore() > maxScore){
                 maxScore = drawnCard.getScore();
                 game.setDealer(player);
             }
+            player.playCard(drawnCard);
+            deck.add(deck.getDeckSize() / 2, drawnCard);
         }
         System.out.println(game.getDealer().getName() + " will be dealing.");
     }

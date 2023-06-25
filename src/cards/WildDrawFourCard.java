@@ -16,10 +16,11 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
     }
 
     @Override
-    public boolean performPenalty(Game game) {
+    public void performPenalty(Game game) {
         Scanner sc = new Scanner(System.in);
         Player previousPlayer = game.getPreviousPlayer();
         Player currentPlayer = game.getCurrentPlayer();
+        Deck deck = game.getDeck();
         System.out.println(currentPlayer.getName() + ", would you like to challenge " + previousPlayer.getName() + "? (y,n)");
         String choice = sc.next();
         if(choice.equalsIgnoreCase("y")){
@@ -30,15 +31,15 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
                 if(card.getColor().equalsIgnoreCase(playableColor) || card.getFaceValue().equalsIgnoreCase(playableFaceValue)){
                     illegal = true;
                     System.out.println(previousPlayer.getName() + " has illegally played draw four. They will draw 4 cards.");
-                    previousPlayer.drawNFromDeck(game.getDeck(), 4);
+                    previousPlayer.drawNFromDeck(deck, 4);
                     break;
                 }
             }
             if(!illegal){
-                System.out.println(previousPlayer.getName() + " has legally played draw four. Continuing" );
+                System.out.println(previousPlayer.getName() + " has legally played draw four. " + currentPlayer.getName() +
+                        " will draw double the cards.");
+                currentPlayer.drawNFromDeck(deck, 8);
             }
-            return illegal;
         }
-        return false;
     }
 }

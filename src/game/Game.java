@@ -13,28 +13,26 @@ import java.util.Scanner;
 
 public abstract class Game {
     private int minPlayers;
-    private List<Player> players;
-    private Player currentPlayer;
-    private Player previousPlayer;
-    private Deck deck;
-    private Card lastDiscardedCard;
-    private List<Card> discardPile;
-    private DealerDeterminationStrategy dealerDeterminationStrategy;
-    private ScoreComputationStrategy scoreComputationStrategy;
-    private DeckInitStrategy deckInitStrategy;
-    private DiscardPileInitStrategy discardPileInitStrategy;
-    private GameDirection direction;
-    private String nextPlayableColor;
-    private String nextPlayableFaceValue;
     private int currentPlayerIndex;
-    private int previousPlayerIndex;
-    private Player lastRoundWinner;
-    private Player maxScorePlayer;
-    private Player dealer;
     private int winnerScore;
     private int initialHandSize;
     private int missedUnoDrawPenalty;
     private int noPlayableCardPenalty;
+    private String nextPlayableColor;
+    private String nextPlayableFaceValue;
+    private List<Player> players;
+    private Player currentPlayer;
+    private Player previousPlayer;
+    private Player roundWinner;
+    private Player maxScorePlayer;
+    private Player dealer;
+    private List<Card> discardPile;
+    private Deck deck;
+    private GameDirection direction;
+    private DealerDeterminationStrategy dealerDeterminationStrategy;
+    private ScoreComputationStrategy scoreComputationStrategy;
+    private DeckInitStrategy deckInitStrategy;
+    private DiscardPileInitStrategy discardPileInitStrategy;
 
     public Game() {
         this.minPlayers = 2;
@@ -46,109 +44,49 @@ public abstract class Game {
         this.deckInitStrategy = new BasicDeckInitStrategy();
         this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
         this.direction = GameDirection.CLOCKWISE;
-        this.nextPlayableColor = null;
-        this.nextPlayableFaceValue = null;
         this.currentPlayerIndex = -1;
-        this.previousPlayerIndex = -1;
         this.winnerScore = 500;
         this.initialHandSize = 7;
         this.missedUnoDrawPenalty = 2;
         this.noPlayableCardPenalty = 1;
     }
-    public void setInitialHandSize(int initialHandSize) {
-        this.initialHandSize = initialHandSize;
-    }
-    public int getWinnerScore() {
-        return winnerScore;
-    }
-
-    public void setWinnerScore(int winnerScore) {
-        this.winnerScore = winnerScore;
-    }
-    public Card getLastDiscardedCard() {
-        return discardPile.get(discardPile.size() - 1);
-    }
-
-    public Player getCurrentPlayer() {
-        return players.get(currentPlayerIndex);
-    }
-
-    public Player getPreviousPlayer() {
-        return players.get(previousPlayerIndex);
-    }
-
-    public Deck getDeck() {
-        return deck;
-    }
-
-    public List<Card> getDiscardPile() {
-        return discardPile;
-    }
-
-    public void setDiscardPile(List<Card> discardPile) {
-        this.discardPile = discardPile;
-    }
-
-
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(List<Player> players) {
-        this.players = players;
-    }
-    public void toggleDirection(){
-        if(direction.toString().equals("CLOCKWISE")){
-            direction = GameDirection.ANTICLOCKWISE;
-        }
-        else{
-            direction = GameDirection.CLOCKWISE;
-        }
-    }
-    public void setMissedUnoDrawPenalty(int missedUnoDrawPenalty) {
-        this.missedUnoDrawPenalty = missedUnoDrawPenalty;
-    }
-
-    public void setNoPlayableCardPenalty(int noPlayableCardPenalty) {
-        this.noPlayableCardPenalty = noPlayableCardPenalty;
-    }
-    public int getPreviousPlayerIndex() {
-        return previousPlayerIndex;
-    }
-
-    public void nextPlayerTurn(){
-        previousPlayerIndex = currentPlayerIndex;
-        if(direction.toString().equals(GameDirection.CLOCKWISE.toString())){
-            currentPlayerIndex = (currentPlayerIndex + (players.size() - 1)) % players.size();
-        }
-        else{
-            currentPlayerIndex = ++currentPlayerIndex % players.size();
-        }
-    }
-    public void setDirection(String direction)  {
-        if(!direction.equalsIgnoreCase("CLOCKWISE") && !direction.equalsIgnoreCase("ANTICLOCKWISE")){
-            throw new IllegalArgumentException("game.Game direction could either be clockwise or anticlockwise");
-        }
-        this.direction = GameDirection.valueOf(direction.toUpperCase());
-    }
-    public void setDeck(Deck deck){
-        this.deck = deck;
-    }
-
-    public String getNextPlayableColor() {
-        return nextPlayableColor;
-    }
-
-    public void setNextPlayableColor(String nextPlayableColor) {
-        this.nextPlayableColor = nextPlayableColor;
-    }
-
-    public String getNextPlayableFaceValue() {
-        return nextPlayableFaceValue;
-    }
-
-    public void setNextPlayableFaceValue(String nextPlayableFaceValue) {
-        this.nextPlayableFaceValue = nextPlayableFaceValue;
+    public final void play() {
+        initializePlayers();
+        deckInitStrategy.initializeDeck(deck);
+        deck.shuffle();
+        dealerDeterminationStrategy.determineDealer(this);
+        do{
+            deal();
+            setCurrentPlayer(players.get(players.indexOf(dealer)));
+            nextPlayerTurn();
+            discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
+            setNextPlayableColor(getLastDiscardedCard().getColor());
+            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
+            while (isOngoing()) {
+                while (getPlayableCards(getCurrentPlayer()).size() == 0) {
+                    getCurrentPlayer().drawNFromDeck(deck, noPlayableCardPenalty);
+                }
+                displayHand(getCurrentPlayer());
+                promptPlayerTurn(getCurrentPlayer());
+                nextPlayerTurn();
+                if (previousPlayer != null && isThereUnoPenalty()) {
+                    performUnoPenalty();
+                }
+                if (getLastDiscardedCard() instanceof IPenalty) {
+                    ((IPenalty) getLastDiscardedCard()).performPenalty(this);
+                    continue;
+                }
+                getLastDiscardedCard().performAction(this);
+            }
+            scoreComputationStrategy.computeScore(players, roundWinner);
+            if(maxScore() < winnerScore){
+                System.out.println("Round winner " + roundWinner.getName() + " has score " + roundWinner.getScore()
+                        + " which is less than " + winnerScore +
+                        ". starting another round...");
+                resetGameDeck();
+            }
+        } while(maxScore() < winnerScore);
+        announceFinalWinner();
     }
     private void initializePlayers(){
         Scanner sc = new Scanner(System.in);
@@ -161,44 +99,42 @@ public abstract class Game {
             players.add(new Player(name));
         }
     }
-    private void checkNumOfPlayers(int numOfPlayers){
-        if(numOfPlayers < minPlayers){
-            throw new IllegalArgumentException("The number of players should be equal to or greater than " + minPlayers);
+    public void deal(){
+        for(Player player : players){
+            for(int i=1;i<=initialHandSize;i++){
+                player.addToHand(deck.drawTop());
+            }
         }
     }
-    public void setMinNumOfPlayers(int playersRequired) {
-        this.minPlayers = playersRequired;
-    }
 
-    public void setDealStrategy(DealerDeterminationStrategy dealerDeterminationStrategy){
-        this.dealerDeterminationStrategy = dealerDeterminationStrategy;
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
-    public void setScoreComputationStrategy(ScoreComputationStrategy scoreComputationStrategy){this.scoreComputationStrategy = scoreComputationStrategy;}
-
-    public int getCurrentPlayerIndex() {
-        return currentPlayerIndex;
+    public void nextPlayerTurn(){
+        previousPlayer = currentPlayer;
+        if(direction.toString().equals(GameDirection.CLOCKWISE.toString())){
+            currentPlayerIndex = (currentPlayerIndex + (players.size() - 1)) % players.size();
+        }
+        else{
+            currentPlayerIndex = ++currentPlayerIndex % players.size();
+        }
+        currentPlayer = players.get(currentPlayerIndex);
     }
-
+    public void setNextPlayableColor(String nextPlayableColor) {
+        this.nextPlayableColor = nextPlayableColor;
+    }
+    public void setNextPlayableFaceValue(String nextPlayableFaceValue) {
+        this.nextPlayableFaceValue = nextPlayableFaceValue;
+    }
     public boolean isOngoing(){
         for(Player player : players){
             if(player.getHand().size() == 0){
-                lastRoundWinner = player;
+                roundWinner = player;
                 return false;
             }
         }
         return true;
     }
-    public void setCurrentPlayerIndex(int currentPlayerIndex) {
-        this.currentPlayerIndex = currentPlayerIndex;
-    }
-    private void displayHand(Player player){
-        System.out.println(player.getName() + ", your hand has the following cards:");
-        for(Card card : player.getHand()){
-            System.out.print(card.getColor() + " " + card.getFaceValue() + ", ");
-        }
-        System.out.println();
-    }
-
     private List<Card> getPlayableCards(Player player){
         List<Card> playableCards = new ArrayList<>();
         for(Card card : player.getHand()){
@@ -207,6 +143,16 @@ public abstract class Game {
             }
         }
         return playableCards;
+    }
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+    private void displayHand(Player player){
+        System.out.println(player.getName() + ", your hand has the following cards:");
+        for(Card card : player.getHand()){
+            System.out.print(card.getColor() + " " + card.getFaceValue() + ", ");
+        }
+        System.out.println();
     }
     private void promptPlayerTurn(Player player){
         System.out.println(getCurrentPlayer().getName() + "'s turn...");
@@ -223,18 +169,30 @@ public abstract class Game {
         player.playCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
 
-        if(player.getHand().size() == 1 && getRandomProbability() >= 0.5){
+        Random random = new Random();
+        double prob = random.nextDouble();
+        if(player.getHand().size() == 1 && prob >= 0.5){
             player.setUnoState(true);
             player.shoutUno();
         }
     }
-
-    private double getRandomProbability(){
-        Random random = new Random();
-        return random.nextDouble();
+    public boolean isThereUnoPenalty(){
+        return (previousPlayer.getHand().size() == 1 && !previousPlayer.isUnoState());
     }
 
-    private int maxScore(){
+    public void performUnoPenalty(){
+        Random random = new Random();
+        double prob = random.nextDouble();
+        if (prob >= 0.5) {
+            System.out.println(getCurrentPlayer().getName() + " found out that " + getPreviousPlayer().getName() +
+                    " did not shout UNO!. " + getPreviousPlayer().getName() + " will draw " + missedUnoDrawPenalty + " cards");
+            previousPlayer.drawNFromDeck(deck, missedUnoDrawPenalty);
+        }
+    }
+    public Card getLastDiscardedCard() {
+        return discardPile.get(discardPile.size() - 1);
+    }
+    public int maxScore(){
         int maxScore = players.get(0).getScore();
         for(Player player : players){
             if(player.getScore() > maxScore){
@@ -244,84 +202,103 @@ public abstract class Game {
         }
         return maxScore;
     }
-
-    private void resetDeck(){
+    public void resetGameDeck(){
+        List<Card> toRemove;
         for(Player player : players){
+            toRemove = new ArrayList<>();
             for(Card card : player.getHand()){
                 deck.getDeck().add(card);
+                toRemove.add(card);
+            }
+            for(Card card: toRemove){
                 player.getHand().remove(card);
             }
-
         }
+        toRemove = new ArrayList<>();
         for(Card card : discardPile){
             deck.add(card);
+            toRemove.add(card);
+        }
+        for(Card card : toRemove){
             discardPile.remove(card);
         }
         deck.shuffle();
     }
-
-    private void announceFinalWinner(){
+    public void announceFinalWinner(){
         System.out.println("Congrats." + maxScorePlayer.getName() + " won with score " + maxScorePlayer.getScore());
     }
-    private void deal(){
-        for(Player player : players){
-            for(int i=1;i<=initialHandSize;i++){
-             player.addToHand(deck.drawTop());
-         }
-      }
+    public Player getPreviousPlayer() {
+        return previousPlayer;
     }
-
+    public Deck getDeck() {
+        return deck;
+    }
+    public List<Player> getPlayers() {
+        return players;
+    }
+    public void toggleDirection(){
+        if(direction.toString().equals("CLOCKWISE")){
+            direction = GameDirection.ANTICLOCKWISE;
+        }
+        else{
+            direction = GameDirection.CLOCKWISE;
+        }
+    }
+    public String getNextPlayableColor() {
+        return nextPlayableColor;
+    }
+    public String getNextPlayableFaceValue() {
+        return nextPlayableFaceValue;
+    }
+    private void checkNumOfPlayers(int numOfPlayers){
+        if(numOfPlayers < minPlayers){
+            throw new IllegalArgumentException("The number of players should be equal to or greater than " + minPlayers);
+        }
+    }
     public void setDealer(Player dealer) {
         this.dealer = dealer;
     }
-
     public Player getDealer() {
         return dealer;
     }
-
-    private boolean isUnoPenalty(){
-        return (previousPlayer.getHand().size() == 1 && !previousPlayer.isUnoState());
+    public void setMinPlayers(int minPlayers) {
+        this.minPlayers = minPlayers;
     }
 
-    private void performUnoPenalty(){
-        if (getRandomProbability() >= 0.5) {
-            System.out.println(getCurrentPlayer().getName() + " found out that " + getPreviousPlayer().getName() +
-                    " did not shout UNO!. " + getPreviousPlayer().getName() + " will draw " + missedUnoDrawPenalty + " cards");
-            previousPlayer.drawNFromDeck(deck, missedUnoDrawPenalty);
-        }
+    public void setWinnerScore(int winnerScore) {
+        this.winnerScore = winnerScore;
     }
-    //Template method
-    public final void play() {
-        initializePlayers();
-        deckInitStrategy.initializeDeck(deck);
-        deck.shuffle();
-        dealerDeterminationStrategy.determineDealer(this);
-        while(maxScore() < winnerScore) {
-            deal();
-            setCurrentPlayerIndex(players.indexOf(dealer));
-            nextPlayerTurn();
-            discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-            setNextPlayableColor(getLastDiscardedCard().getColor());
-            setNextPlayableFaceValue(getLastDiscardedCard().getFaceValue());
-            while (isOngoing()) {
-                while (getPlayableCards(getCurrentPlayer()).size() == 0) {
-                    getCurrentPlayer().drawNFromDeck(deck, noPlayableCardPenalty);
-                }
-                displayHand(getCurrentPlayer());
-                promptPlayerTurn(getCurrentPlayer());
-                nextPlayerTurn();
-                if (previousPlayer != null && isUnoPenalty()) {
-                    performUnoPenalty();
-                }
-                if (getLastDiscardedCard() instanceof IPenalty) {
-                    if (((IPenalty) getLastDiscardedCard()).performPenalty(this)) {
-                        continue;
-                    }
-                }
-                getLastDiscardedCard().performAction(this);
-            }
-            scoreComputationStrategy.computeScore(players, lastRoundWinner);
-        }
-        announceFinalWinner();
+
+    public void setInitialHandSize(int initialHandSize) {
+        this.initialHandSize = initialHandSize;
     }
+
+    public void setDirection(String direction)  {
+        if(!direction.equalsIgnoreCase("CLOCKWISE") && !direction.equalsIgnoreCase("ANTICLOCKWISE")){
+            throw new IllegalArgumentException("Game direction could either be clockwise or anticlockwise");
+        }
+        this.direction = GameDirection.valueOf(direction.toUpperCase());
+    }
+    public void setMissedUnoDrawPenalty(int missedUnoDrawPenalty) {
+        this.missedUnoDrawPenalty = missedUnoDrawPenalty;
+    }
+    public void setNoPlayableCardPenalty(int noPlayableCardPenalty) {
+        this.noPlayableCardPenalty = noPlayableCardPenalty;
+    }
+    public void setDealerDeterminationStrategy(DealerDeterminationStrategy dealerDeterminationStrategy) {
+        this.dealerDeterminationStrategy = dealerDeterminationStrategy;
+    }
+    public void setDeckInitStrategy(DeckInitStrategy deckInitStrategy) {
+        this.deckInitStrategy = deckInitStrategy;
+    }
+
+    public void setDiscardPileInitStrategy(DiscardPileInitStrategy discardPileInitStrategy) {
+        this.discardPileInitStrategy = discardPileInitStrategy;
+    }
+
+    public void setDealStrategy(DealerDeterminationStrategy dealerDeterminationStrategy){
+        this.dealerDeterminationStrategy = dealerDeterminationStrategy;
+    }
+    public void setScoreComputationStrategy(ScoreComputationStrategy scoreComputationStrategy){this.scoreComputationStrategy = scoreComputationStrategy;}
+
 }

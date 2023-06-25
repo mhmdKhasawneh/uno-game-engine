@@ -38,10 +38,8 @@ public class Deck {
         }
     }
     public Card drawTop(){
-        Card card = deck.get(deck.size() - 1);
-        deck.remove(deck.size()-1);
         deckSize--;
-        return card;
+        return deck.remove(deck.size()-1);
     }
 
     public void show(){
