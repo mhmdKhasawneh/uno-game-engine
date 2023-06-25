@@ -8,7 +8,7 @@ public class DrawTwoCard extends AbstractActionCard {
     }
     @Override
     public void performAction(Game game) {
-        game.getCurrentPlayer().drawNFromDeck(game.getDeck(), 2);
+        game.getCurrentPlayerTurn().drawNFromDeck(game.getDeck(), 2);
         game.nextPlayerTurn();
     }
 }

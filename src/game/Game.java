@@ -1,6 +1,5 @@
 package game;
 
-import cards.BasicEnumCardColor;
 import cards.Card;
 import cards.Deck;
 import cards.IPenalty;
@@ -65,11 +64,11 @@ public abstract class Game {
                 if(!skipAction) {
                     getLastDiscardedCard().performAction(this);
                 }
-                while (getPlayableCards(getCurrentPlayer()).size() == 0) {
-                    getCurrentPlayer().drawNFromDeck(deck, noPlayableCardPenalty);
+                while (getCurrentPlayerTurn().getPlayableCards(getCurrentPlayerTurn(), nextPlayableColor, nextPlayableFaceValue).size() == 0) {
+                    getCurrentPlayerTurn().drawNFromDeck(deck, noPlayableCardPenalty);
                 }
-                displayHand(getCurrentPlayer());
-                promptPlayerTurn(getCurrentPlayer());
+                displayHand(getCurrentPlayerTurn());
+                promptPlayerTurn(getCurrentPlayerTurn());
                 nextPlayerTurn();
                 if (previousPlayer != null && isThereUnoPenalty()) {
                     performUnoPenalty();
@@ -139,16 +138,7 @@ public abstract class Game {
         }
         return true;
     }
-    private List<Card> getPlayableCards(Player player){
-        List<Card> playableCards = new ArrayList<>();
-        for(Card card : player.getHand()){
-            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue) || card.getColor().equalsIgnoreCase(BasicEnumCardColor.WILD.toString())){
-                playableCards.add(card);
-            }
-        }
-        return playableCards;
-    }
-    public Player getCurrentPlayer() {
+    public Player getCurrentPlayerTurn() {
         return currentPlayer;
     }
     private void displayHand(Player player){
@@ -159,10 +149,10 @@ public abstract class Game {
         System.out.println();
     }
     private void promptPlayerTurn(Player player){
-        System.out.println(getCurrentPlayer().getName() + "'s turn...");
+        System.out.println(getCurrentPlayerTurn().getName() + "'s turn...");
         System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " + getLastDiscardedCard().getFaceValue());
         System.out.println("What card would you like to play?");
-        List<Card> playableCards = getPlayableCards(player);
+        List<Card> playableCards = player.getPlayableCards(player, nextPlayableColor, nextPlayableFaceValue);
         int i = 1;
         for(Card card : playableCards){
             System.out.println(i + "- " + card.getColor() + " " + card.getFaceValue());
@@ -170,6 +160,10 @@ public abstract class Game {
         }
         Scanner sc = new Scanner(System.in);
         int choice = sc.nextInt();
+        while(choice - 1 >= playableCards.size()){
+            System.out.println("Pick a valid card.");
+            choice = sc.nextInt();
+        }
         player.throwCard(playableCards.get(choice - 1));
         discardPile.add(playableCards.get(choice - 1));
 
@@ -188,7 +182,7 @@ public abstract class Game {
         Random random = new Random();
         double prob = random.nextDouble();
         if (prob >= 0.5) {
-            System.out.println(getCurrentPlayer().getName() + " found out that " + getPreviousPlayer().getName() +
+            System.out.println(getCurrentPlayerTurn().getName() + " found out that " + getPreviousPlayer().getName() +
                     " did not shout UNO!. " + getPreviousPlayer().getName() + " will draw " + missedUnoDrawPenalty + " cards");
             previousPlayer.drawNFromDeck(deck, missedUnoDrawPenalty);
         }

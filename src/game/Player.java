@@ -1,5 +1,6 @@
 package game;
 
+import cards.BasicEnumCardColor;
 import cards.Card;
 import cards.Deck;
 
@@ -62,6 +63,16 @@ public class Player {
     public Card throwCard(Card card){
         hand.remove(card);
         return card;
+    }
+    public List<Card> getPlayableCards(Player player, String nextPlayableColor, String nextPlayableFaceValue){
+        List<Card> playableCards = new ArrayList<>();
+        for(Card card : player.getHand()){
+            if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue)
+                    || card.getColor().equalsIgnoreCase(BasicEnumCardColor.WILD.toString())){
+                playableCards.add(card);
+            }
+        }
+        return playableCards;
     }
     public void shoutUno(){
         System.out.println("UNO!");

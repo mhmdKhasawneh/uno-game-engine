@@ -11,7 +11,7 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
     public void performAction(Game game) {
         changeNextPlayableColor(game);
 
-        game.getCurrentPlayer().drawNFromDeck(game.getDeck(), 4);
+        game.getCurrentPlayerTurn().drawNFromDeck(game.getDeck(), 4);
         game.nextPlayerTurn();
     }
 
@@ -19,7 +19,7 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
     public void performPenalty(Game game) {
         Scanner sc = new Scanner(System.in);
         Player previousPlayer = game.getPreviousPlayer();
-        Player currentPlayer = game.getCurrentPlayer();
+        Player currentPlayer = game.getCurrentPlayerTurn();
         Deck deck = game.getDeck();
         System.out.println(currentPlayer.getName() + ", would you like to challenge " + previousPlayer.getName() + "? (y,n)");
         String choice = sc.next();
