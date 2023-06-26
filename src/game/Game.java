@@ -32,20 +32,9 @@ public abstract class Game {
     private DiscardPileInitStrategy discardPileInitStrategy;
 
     public Game() {
-        this.minPlayers = 2;
         this.players = new ArrayList<>();
         this.discardPile = new ArrayList<>();
-        this.deck = new BasicDeck();
-        this.dealerDeterminationStrategy = new BasicDealerDeterminationStrategy();
-        this.scoreComputationStrategy = new BasicScoreComputationStrategy();
-        this.deckInitStrategy = new BasicDeckInitStrategy();
-        this.discardPileInitStrategy = new BasicDiscardPileInitStrategy();
-        this.direction = GameDirection.CLOCKWISE;
         this.currentPlayerIndex = -1;
-        this.winningScore = 500;
-        this.initialHandSize = 7;
-        this.missedUnoDrawPenalty = 2;
-        this.noPlayableCardPenalty = 1;
     }
     public final void play() {
         initializePlayers();
@@ -288,7 +277,7 @@ public abstract class Game {
         this.deck = deck;
     }
 
-    public void setDirection(String direction)  {
+    public void setGameDirection(String direction)  {
         if(!direction.equalsIgnoreCase("CLOCKWISE") && !direction.equalsIgnoreCase("ANTICLOCKWISE")){
             throw new IllegalArgumentException("Game direction could either be clockwise or anticlockwise");
         }

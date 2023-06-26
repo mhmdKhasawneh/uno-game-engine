@@ -14,30 +14,6 @@ public abstract class AbstractDeck {
     public AbstractDeck() {
         deck = new ArrayList<>();
         deckSize = 0;
-        deckColors = new ArrayList<>(){{
-            add("RED");
-            add("GREEN");
-            add("BLUE");
-            add("YELLOW");
-            add("WILD");
-        }};
-        deckFaceValues = new ArrayList<>(){{
-            add("ZERO");
-            add("ONE");
-            add("TWO");
-            add("THREE");
-            add("FOUR");
-            add("FIVE");
-            add("SIX");
-            add("SEVEN");
-            add("EIGHT");
-            add("NINE");
-            add("REVERSE");
-            add("SKIP");
-            add("DRAW_TWO");
-            add("WILD_DRAW_FOUR");
-            add("WILD");
-        }};
     }
 
     public void add(AbstractCard card){
@@ -72,6 +48,15 @@ public abstract class AbstractDeck {
             deck.set(j, temp);
         }
     }
+
+    public void setDeckColors(List<String> deckColors) {
+        this.deckColors = deckColors;
+    }
+
+    public void setDeckFaceValues(List<String> deckFaceValues) {
+        this.deckFaceValues = deckFaceValues;
+    }
+
     public boolean doesContainColor(String color){
         return deckColors.contains(color.toUpperCase());
     }
