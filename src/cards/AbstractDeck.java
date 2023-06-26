@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class AbstractDeck {
-    private List<Card> deck;
+    private List<AbstractCard> deck;
     private int deckSize;
     private List<String> deckColors;
     private List<String> deckFaceValues;
@@ -40,20 +40,20 @@ public abstract class AbstractDeck {
         }};
     }
 
-    public void add(Card card){
+    public void add(AbstractCard card){
         deck.add(card);
         deckSize++;
     }
-    public void add(int index, Card card){
+    public void add(int index, AbstractCard card){
         deck.add(index, card);
         deckSize++;
     }
-    public void addN(Card card, int num){
+    public void addN(AbstractCard card, int num){
         while(num-- > 0){
             add(card);
         }
     }
-    public Card drawTop(){
+    public AbstractCard drawTop(){
         deckSize--;
         return deck.remove(deck.size()-1);
     }
@@ -67,7 +67,7 @@ public abstract class AbstractDeck {
         Random random = new Random();
         for (int i = deck.size() - 1; i > 0; i--) {
             int j = random.nextInt(i + 1);
-            Card temp = deck.get(i);
+            AbstractCard temp = deck.get(i);
             deck.set(i, deck.get(j));
             deck.set(j, temp);
         }
@@ -82,7 +82,7 @@ public abstract class AbstractDeck {
         return deckSize;
     }
 
-    public final List<Card> getDeck() {
+    public final List<AbstractCard> getDeck() {
         return deck;
     }
     public List<String> getColors(){
@@ -93,7 +93,7 @@ public abstract class AbstractDeck {
     }
     public void show(){
         int i=0;
-        for(Card card : deck){
+        for(AbstractCard card : deck){
             System.out.println(card.getColor() + " " + card.getFaceValue() + " " + card.getScore());
             i++;
         }

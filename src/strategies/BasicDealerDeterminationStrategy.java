@@ -1,7 +1,7 @@
 package strategies;
 
 import cards.AbstractDeck;
-import cards.Card;
+import cards.AbstractCard;
 import cards.NumberedCard;
 import game.*;
 
@@ -15,7 +15,7 @@ public class BasicDealerDeterminationStrategy implements DealerDeterminationStra
         AbstractDeck abstractDeck = game.getDeck();
         int maxScore = -1;
         for(Player player : players){
-            Card drawnCard = player.drawFromDeck(abstractDeck);
+            AbstractCard drawnCard = player.drawFromDeck(abstractDeck);
             while(!(drawnCard instanceof NumberedCard)){
                 abstractDeck.add(abstractDeck.getDeckSize()/2, drawnCard);
                 player.throwCard(drawnCard);

@@ -1,10 +1,10 @@
 package cards;
 import game.*;
-public abstract class Card {
+public abstract class AbstractCard {
     private String color;
     private String faceValue;
     private int score;
-    public Card(String color, String faceValue) {
+    public AbstractCard(String color, String faceValue) {
         this.color = color.toUpperCase();
         this.faceValue = faceValue.toUpperCase();
     }

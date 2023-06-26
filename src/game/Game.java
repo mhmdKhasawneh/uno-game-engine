@@ -23,7 +23,7 @@ public abstract class Game {
     private Player roundWinner;
     private Player maxScorePlayer;
     private Player dealer;
-    private List<Card> discardPile;
+    private List<AbstractCard> discardPile;
     private AbstractDeck deck;
     private GameDirection direction;
     private DealerDeterminationStrategy dealerDeterminationStrategy;
@@ -155,7 +155,7 @@ public abstract class Game {
     }
     public void displayHand(Player player){
         System.out.println(player.getName() + ", your hand has the following cards:");
-        for(Card card : player.getHand()){
+        for(AbstractCard card : player.getHand()){
             System.out.print(card.getColor() + " " + card.getFaceValue() + ", ");
         }
         System.out.println();
@@ -165,9 +165,9 @@ public abstract class Game {
         System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " +
                 getLastDiscardedCard().getFaceValue());
         System.out.println("What card would you like to play?");
-        List<Card> playableCards = player.getPlayableCards(nextPlayableColor, nextPlayableFaceValue);
+        List<AbstractCard> playableCards = player.getPlayableCards(nextPlayableColor, nextPlayableFaceValue);
         int i = 1;
-        for(Card card : playableCards){
+        for(AbstractCard card : playableCards){
             System.out.println(i + "- " + card.getColor() + " " + card.getFaceValue());
             i++;
         }
@@ -200,7 +200,7 @@ public abstract class Game {
             previousPlayer.drawNFromDeck(deck, missedUnoDrawPenalty);
         }
     }
-    public Card getLastDiscardedCard() {
+    public AbstractCard getLastDiscardedCard() {
         return discardPile.get(discardPile.size() - 1);
     }
     public int maxScore(){
@@ -214,23 +214,23 @@ public abstract class Game {
         return maxScore;
     }
     public void resetGameDeck(){
-        List<Card> toRemove;
+        List<AbstractCard> toRemove;
         for(Player player : players){
             toRemove = new ArrayList<>();
-            for(Card card : player.getHand()){
+            for(AbstractCard card : player.getHand()){
                 deck.getDeck().add(card);
                 toRemove.add(card);
             }
-            for(Card card: toRemove){
+            for(AbstractCard card: toRemove){
                 player.getHand().remove(card);
             }
         }
         toRemove = new ArrayList<>();
-        for(Card card : discardPile){
+        for(AbstractCard card : discardPile){
             deck.add(card);
             toRemove.add(card);
         }
-        for(Card card : toRemove){
+        for(AbstractCard card : toRemove){
             discardPile.remove(card);
         }
         deck.shuffle();

@@ -1,6 +1,6 @@
 package strategies;
 import game.Player;
-import cards.Card;
+import cards.AbstractCard;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class BasicScoreComputationStrategy implements ScoreComputationStrategy{
     public void computeScore(List<Player> players, Player roundWinner){
         int score = 0;
         for(Player player : players){
-            for(Card card : player.getHand()){
+            for(AbstractCard card : player.getHand()){
                 score += card.getScore();
             }
         }

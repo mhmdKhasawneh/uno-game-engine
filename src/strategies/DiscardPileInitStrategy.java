@@ -1,10 +1,10 @@
 package strategies;
 
 import cards.AbstractDeck;
-import cards.Card;
+import cards.AbstractCard;
 
 import java.util.List;
 
 public interface DiscardPileInitStrategy {
-    void initializeDiscardPile(List<Card> discardPile, AbstractDeck abstractDeck);
+    void initializeDiscardPile(List<AbstractCard> discardPile, AbstractDeck abstractDeck);
 }

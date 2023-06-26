@@ -27,7 +27,7 @@ public final class WildDrawFourCard extends AbstractWildCard implements IPenalty
             String playableColor = game.getNextPlayableColor();
             String playableFaceValue = game.getNextPlayableFaceValue();
             boolean illegal = false;
-            for (Card card : previousPlayer.getHand()) {
+            for (AbstractCard card : previousPlayer.getHand()) {
                 if (card.getColor().equalsIgnoreCase(playableColor) || card.getFaceValue().equalsIgnoreCase(playableFaceValue)) {
                     illegal = true;
                     System.out.println(previousPlayer.getName() + " has illegally played draw four. They will draw 4 cards.");

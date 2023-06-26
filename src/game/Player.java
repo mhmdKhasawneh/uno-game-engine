@@ -1,7 +1,7 @@
 package game;
 
 import cards.AbstractDeck;
-import cards.Card;
+import cards.AbstractCard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ public class Player {
     private String name;
     private int score;
     private boolean isUnoState;
-    private List<Card> hand;
+    private List<AbstractCard> hand;
 
     public Player(String name){
         setName(name);
@@ -40,12 +40,12 @@ public class Player {
         isUnoState = unoState;
     }
 
-    public List<Card> getHand() {
+    public List<AbstractCard> getHand() {
         return hand;
     }
-    public Card drawFromDeck(AbstractDeck abstractDeck)   {
+    public AbstractCard drawFromDeck(AbstractDeck abstractDeck)   {
         System.out.println(getName() + " is drawing from deck...");
-        Card card = abstractDeck.drawTop();
+        AbstractCard card = abstractDeck.drawTop();
         hand.add(card);
         this.isUnoState = false;
         return card;
@@ -55,17 +55,17 @@ public class Player {
             drawFromDeck(abstractDeck);
         }
     }
-    public void addToHand(Card card){
+    public void addToHand(AbstractCard card){
         hand.add(card);
         this.isUnoState = false;
     }
-    public Card throwCard(Card card){
+    public AbstractCard throwCard(AbstractCard card){
         hand.remove(card);
         return card;
     }
-    public List<Card> getPlayableCards(String nextPlayableColor, String nextPlayableFaceValue){
-        List<Card> playableCards = new ArrayList<>();
-        for(Card card : getHand()){
+    public List<AbstractCard> getPlayableCards(String nextPlayableColor, String nextPlayableFaceValue){
+        List<AbstractCard> playableCards = new ArrayList<>();
+        for(AbstractCard card : getHand()){
             if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue)
                     || card.getColor().equalsIgnoreCase("WILD")){
                 playableCards.add(card);
