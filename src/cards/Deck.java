@@ -1,16 +1,43 @@
 package cards;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class Deck {
     private List<Card> deck;
     private int deckSize;
+    private List<String> deckColors;
+    private List<String> deckFaceValues;
 
     public Deck() {
         deck = new ArrayList<>();
         deckSize = 0;
+        deckColors = new ArrayList<>(){{
+            add("RED");
+            add("GREEN");
+            add("BLUE");
+            add("YELLOW");
+            add("WILD");
+        }};
+        deckFaceValues = new ArrayList<>(){{
+            add("ZERO");
+            add("ONE");
+            add("TWO");
+            add("THREE");
+            add("FOUR");
+            add("FIVE");
+            add("SIX");
+            add("SEVEN");
+            add("EIGHT");
+            add("NINE");
+            add("REVERSE");
+            add("SKIP");
+            add("DRAW_TWO");
+            add("WILD_DRAW_FOUR");
+            add("WILD");
+        }};
     }
 
     public int getDeckSize() {
@@ -48,5 +75,24 @@ public class Deck {
             i++;
         }
         System.out.println(i + " total cards");
+    }
+
+    public List<String> getColors(){
+        return Collections.unmodifiableList(deckColors);
+    }
+    public void addColor(String color){
+        deckColors.add(color.toUpperCase());
+    }
+    public boolean doesContainColor(String color){
+        return deckColors.contains(color.toUpperCase());
+    }
+    public List<String> getFaceValues(){
+        return Collections.unmodifiableList(deckFaceValues);
+    }
+    public void addFaceValue(String faceValue){
+        deckFaceValues.add(faceValue.toUpperCase());
+    }
+    public boolean doesContainFaceValue(String faceValue){
+        return deckFaceValues.contains(faceValue.toUpperCase());
     }
 }

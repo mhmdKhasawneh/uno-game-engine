@@ -5,12 +5,12 @@ import cards.*;
 public class BasicDeckInitStrategy implements DeckInitStrategy{
     @Override
     public void initializeDeck(Deck deck) {
-        for(String color : CardColorsList.getColors()){
+        for(String color : deck.getColors()){
             if(color.equals("WILD")){
                 break;
             }
             int i = 0;
-            for(String value : CardFaceValuesList.getFaceValues()){
+            for(String value : deck.getFaceValues()){
                 if(i == 13){
                     break;
                 }

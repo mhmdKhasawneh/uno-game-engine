@@ -131,7 +131,7 @@ public abstract class Game {
         Scanner sc = new Scanner(System.in);
         System.out.println("What color do you want to change to?");
         String newColor = sc.next().toUpperCase();
-        while(!CardColorsList.doesContain(newColor)){
+        while(!deck.doesContainColor(newColor)){
             System.out.println("Enter a valid color");
             newColor = sc.next().toUpperCase();
         }
