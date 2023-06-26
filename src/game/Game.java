@@ -122,6 +122,9 @@ public abstract class Game {
         currentPlayer = players.get(currentPlayerIndex);
     }
     public void setNextPlayableColor(String nextPlayableColor) {
+        if(!deck.doesContainColor(nextPlayableColor)){
+            throw new IllegalArgumentException("Color is invalid");
+        }
         this.nextPlayableColor = nextPlayableColor;
     }
     public void setNextPlayableFaceValue(String nextPlayableFaceValue) {
