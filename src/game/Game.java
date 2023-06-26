@@ -24,7 +24,7 @@ public abstract class Game {
     private Player maxScorePlayer;
     private Player dealer;
     private List<Card> discardPile;
-    private Deck deck;
+    private AbstractDeck deck;
     private GameDirection direction;
     private DealerDeterminationStrategy dealerDeterminationStrategy;
     private ScoreComputationStrategy scoreComputationStrategy;
@@ -35,7 +35,7 @@ public abstract class Game {
         this.minPlayers = 2;
         this.players = new ArrayList<>();
         this.discardPile = new ArrayList<>();
-        this.deck = new Deck();
+        this.deck = new BasicDeck();
         this.dealerDeterminationStrategy = new BasicDealerDeterminationStrategy();
         this.scoreComputationStrategy = new BasicScoreComputationStrategy();
         this.deckInitStrategy = new BasicDeckInitStrategy();
@@ -57,12 +57,12 @@ public abstract class Game {
             setCurrentPlayer(players.get(players.indexOf(dealer)));
             nextPlayerTurn();
             discardPileInitStrategy.initializeDiscardPile(discardPile, deck);
-            boolean skipAction = false;
+            boolean willPerformAction = true;
             while (isOngoing()) {
-                if(!skipAction) {
+                if(willPerformAction) {
                     getLastDiscardedCard().performAction(this);
                 }
-                while (getCurrentPlayerTurn().getPlayableCards(getCurrentPlayerTurn(), nextPlayableColor, nextPlayableFaceValue).size() == 0) {
+                while (getCurrentPlayerTurn().getPlayableCards(nextPlayableColor, nextPlayableFaceValue).size() == 0) {
                     getCurrentPlayerTurn().drawNFromDeck(deck, noPlayableCardPenalty);
                 }
                 displayHand(getCurrentPlayerTurn());
@@ -73,10 +73,10 @@ public abstract class Game {
                 }
                 if (getLastDiscardedCard() instanceof IPenalty) {
                     ((IPenalty) getLastDiscardedCard()).performPenalty(this);
-                    skipAction = true;
+                    willPerformAction = false;
                 }
                 else{
-                    skipAction = false;
+                    willPerformAction = true;
                 }
             }
             scoreComputationStrategy.computeScore(players, roundWinner);
@@ -89,7 +89,7 @@ public abstract class Game {
         } while(maxScore() < winningScore);
         announceFinalWinner();
     }
-    private void initializePlayers(){
+    public void initializePlayers(){
         Scanner sc = new Scanner(System.in);
         System.out.println("How many players do you want to register in the game?");
         int numOfPlayers = sc.nextInt();
@@ -100,7 +100,7 @@ public abstract class Game {
             players.add(new Player(name));
         }
     }
-    public void deal(){
+    public final void deal(){
         for(Player player : players){
             for(int i=1;i<=initialHandSize;i++){
                 player.addToHand(deck.drawTop());
@@ -150,18 +150,19 @@ public abstract class Game {
     public Player getCurrentPlayerTurn() {
         return currentPlayer;
     }
-    private void displayHand(Player player){
+    public void displayHand(Player player){
         System.out.println(player.getName() + ", your hand has the following cards:");
         for(Card card : player.getHand()){
             System.out.print(card.getColor() + " " + card.getFaceValue() + ", ");
         }
         System.out.println();
     }
-    private void promptPlayerTurn(Player player){
+    public void promptPlayerTurn(Player player){
         System.out.println(getCurrentPlayerTurn().getName() + "'s turn...");
-        System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " + getLastDiscardedCard().getFaceValue());
+        System.out.println("Top card in discard pile is " + getLastDiscardedCard().getColor() + " " +
+                getLastDiscardedCard().getFaceValue());
         System.out.println("What card would you like to play?");
-        List<Card> playableCards = player.getPlayableCards(player, nextPlayableColor, nextPlayableFaceValue);
+        List<Card> playableCards = player.getPlayableCards(nextPlayableColor, nextPlayableFaceValue);
         int i = 1;
         for(Card card : playableCards){
             System.out.println(i + "- " + card.getColor() + " " + card.getFaceValue());
@@ -237,7 +238,7 @@ public abstract class Game {
     public Player getPreviousPlayer() {
         return previousPlayer;
     }
-    public Deck getDeck() {
+    public AbstractDeck getDeck() {
         return deck;
     }
     public List<Player> getPlayers() {
@@ -278,6 +279,10 @@ public abstract class Game {
 
     public void setInitialHandSize(int initialHandSize) {
         this.initialHandSize = initialHandSize;
+    }
+
+    public void setDeck(AbstractDeck deck) {
+        this.deck = deck;
     }
 
     public void setDirection(String direction)  {

@@ -1,7 +1,7 @@
 package strategies;
 
-import cards.Deck;
+import cards.AbstractDeck;
 
 public interface DeckInitStrategy {
-    void initializeDeck(Deck deck);
+    void initializeDeck(AbstractDeck abstractDeck);
 }

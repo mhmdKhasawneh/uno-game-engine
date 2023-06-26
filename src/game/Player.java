@@ -1,7 +1,7 @@
 package game;
 
+import cards.AbstractDeck;
 import cards.Card;
-import cards.Deck;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +43,16 @@ public class Player {
     public List<Card> getHand() {
         return hand;
     }
-    public Card drawFromDeck(Deck deck)   {
+    public Card drawFromDeck(AbstractDeck abstractDeck)   {
         System.out.println(getName() + " is drawing from deck...");
-        Card card = deck.drawTop();
+        Card card = abstractDeck.drawTop();
         hand.add(card);
         this.isUnoState = false;
         return card;
     }
-    public void drawNFromDeck(Deck deck, int numToDraw)  {
+    public void drawNFromDeck(AbstractDeck abstractDeck, int numToDraw)  {
         while(numToDraw-- > 0){
-            drawFromDeck(deck);
+            drawFromDeck(abstractDeck);
         }
     }
     public void addToHand(Card card){
@@ -63,9 +63,9 @@ public class Player {
         hand.remove(card);
         return card;
     }
-    public List<Card> getPlayableCards(Player player, String nextPlayableColor, String nextPlayableFaceValue){
+    public List<Card> getPlayableCards(String nextPlayableColor, String nextPlayableFaceValue){
         List<Card> playableCards = new ArrayList<>();
-        for(Card card : player.getHand()){
+        for(Card card : getHand()){
             if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue)
                     || card.getColor().equalsIgnoreCase("WILD")){
                 playableCards.add(card);

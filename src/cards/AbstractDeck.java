@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class Deck {
+public abstract class AbstractDeck {
     private List<Card> deck;
     private int deckSize;
     private List<String> deckColors;
     private List<String> deckFaceValues;
 
-    public Deck() {
+    public AbstractDeck() {
         deck = new ArrayList<>();
         deckSize = 0;
         deckColors = new ArrayList<>(){{
@@ -40,13 +40,6 @@ public class Deck {
         }};
     }
 
-    public int getDeckSize() {
-        return deckSize;
-    }
-
-    public final List<Card> getDeck() {
-        return deck;
-    }
     public void add(Card card){
         deck.add(card);
         deckSize++;
@@ -54,6 +47,21 @@ public class Deck {
     public void add(int index, Card card){
         deck.add(index, card);
         deckSize++;
+    }
+    public void addN(Card card, int num){
+        while(num-- > 0){
+            add(card);
+        }
+    }
+    public Card drawTop(){
+        deckSize--;
+        return deck.remove(deck.size()-1);
+    }
+    public void addFaceValue(String faceValue){
+        deckFaceValues.add(faceValue.toUpperCase());
+    }
+    public void addColor(String color){
+        deckColors.add(color.toUpperCase());
     }
     public void shuffle(){
         Random random = new Random();
@@ -64,9 +72,24 @@ public class Deck {
             deck.set(j, temp);
         }
     }
-    public Card drawTop(){
-        deckSize--;
-        return deck.remove(deck.size()-1);
+    public boolean doesContainColor(String color){
+        return deckColors.contains(color.toUpperCase());
+    }
+    public boolean doesContainFaceValue(String faceValue){
+        return deckFaceValues.contains(faceValue.toUpperCase());
+    }
+    public int getDeckSize() {
+        return deckSize;
+    }
+
+    public final List<Card> getDeck() {
+        return deck;
+    }
+    public List<String> getColors(){
+        return Collections.unmodifiableList(deckColors);
+    }
+    public List<String> getFaceValues(){
+        return Collections.unmodifiableList(deckFaceValues);
     }
     public void show(){
         int i=0;
@@ -75,24 +98,5 @@ public class Deck {
             i++;
         }
         System.out.println(i + " total cards");
-    }
-
-    public List<String> getColors(){
-        return Collections.unmodifiableList(deckColors);
-    }
-    public void addColor(String color){
-        deckColors.add(color.toUpperCase());
-    }
-    public boolean doesContainColor(String color){
-        return deckColors.contains(color.toUpperCase());
-    }
-    public List<String> getFaceValues(){
-        return Collections.unmodifiableList(deckFaceValues);
-    }
-    public void addFaceValue(String faceValue){
-        deckFaceValues.add(faceValue.toUpperCase());
-    }
-    public boolean doesContainFaceValue(String faceValue){
-        return deckFaceValues.contains(faceValue.toUpperCase());
     }
 }
