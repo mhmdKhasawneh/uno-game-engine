@@ -40,6 +40,7 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
                         " will draw double the cards.");
                 currentPlayer.drawNFromDeck(deck, 8);
             }
+            game.promptUserToChangeColor();
         } else {
             performAction(game);
         }
