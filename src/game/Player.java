@@ -67,7 +67,7 @@ public class Player {
         List<Card> playableCards = new ArrayList<>();
         for(Card card : player.getHand()){
             if(card.getColor().equalsIgnoreCase(nextPlayableColor) || card.getFaceValue().equalsIgnoreCase(nextPlayableFaceValue)
-                    || card.getColor().equalsIgnoreCase(BasicEnumCardColor.WILD.toString())){
+                    || card.getColor().equalsIgnoreCase("WILD")){
                 playableCards.add(card);
             }
         }
