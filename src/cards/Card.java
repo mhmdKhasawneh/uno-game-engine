@@ -5,8 +5,8 @@ public abstract class Card {
     private String faceValue;
     private int score;
     public Card(String color, String faceValue) {
-        this.color = color;
-        this.faceValue = faceValue;
+        this.color = color.toUpperCase();
+        this.faceValue = faceValue.toUpperCase();
     }
     public final String getColor(){
         return color;

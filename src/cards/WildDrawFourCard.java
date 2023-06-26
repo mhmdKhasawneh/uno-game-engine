@@ -9,7 +9,7 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
 
     @Override
     public void performAction(Game game) {
-        changeNextPlayableColor(game);
+        game.promptUserToChangeColor();
 
         game.getCurrentPlayerTurn().drawNFromDeck(game.getDeck(), 4);
         game.nextPlayerTurn();
@@ -23,23 +23,25 @@ public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
         Deck deck = game.getDeck();
         System.out.println(currentPlayer.getName() + ", would you like to challenge " + previousPlayer.getName() + "? (y,n)");
         String choice = sc.next();
-        if(choice.equalsIgnoreCase("y")){
+        if (choice.equalsIgnoreCase("y")) {
             String playableColor = game.getNextPlayableColor();
             String playableFaceValue = game.getNextPlayableFaceValue();
             boolean illegal = false;
-            for(Card card : previousPlayer.getHand()){
-                if(card.getColor().equalsIgnoreCase(playableColor) || card.getFaceValue().equalsIgnoreCase(playableFaceValue)){
+            for (Card card : previousPlayer.getHand()) {
+                if (card.getColor().equalsIgnoreCase(playableColor) || card.getFaceValue().equalsIgnoreCase(playableFaceValue)) {
                     illegal = true;
                     System.out.println(previousPlayer.getName() + " has illegally played draw four. They will draw 4 cards.");
                     previousPlayer.drawNFromDeck(deck, 4);
                     break;
                 }
             }
-            if(!illegal){
+            if (!illegal) {
                 System.out.println(previousPlayer.getName() + " has legally played draw four. " + currentPlayer.getName() +
                         " will draw double the cards.");
                 currentPlayer.drawNFromDeck(deck, 8);
             }
+        } else {
+            performAction(game);
         }
     }
 }

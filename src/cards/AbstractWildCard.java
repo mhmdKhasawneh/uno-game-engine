@@ -7,22 +7,4 @@ public abstract class AbstractWildCard extends Card{
         super(color, faceValue);
         setScore(50);
     }
-
-    public void changeNextPlayableColor(Game game){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("What color do you want to change to?");
-        String newColor = sc.next().toUpperCase();
-        do{
-            try{
-                BasicEnumCardColor.valueOf(newColor);
-                break;
-            } catch(IllegalArgumentException e){
-                System.out.println("Color chosen is invalid.");
-            }
-            System.out.println("Enter a valid color");
-            newColor = sc.next().toUpperCase();
-        }while(true);
-        game.setNextPlayableColor(newColor);
-        game.setNextPlayableFaceValue(null);
-    }
 }

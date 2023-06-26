@@ -1,8 +1,6 @@
 package game;
 
-import cards.Card;
-import cards.Deck;
-import cards.IPenalty;
+import cards.*;
 import strategies.*;
 
 import java.util.ArrayList;
@@ -128,6 +126,17 @@ public abstract class Game {
     }
     public void setNextPlayableFaceValue(String nextPlayableFaceValue) {
         this.nextPlayableFaceValue = nextPlayableFaceValue;
+    }
+    public void promptUserToChangeColor(){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("What color do you want to change to?");
+        String newColor = sc.next().toUpperCase();
+        while(!CardColorsList.doesContain(newColor)){
+            System.out.println("Enter a valid color");
+            newColor = sc.next().toUpperCase();
+        }
+        setNextPlayableColor(newColor);
+        setNextPlayableFaceValue(null);
     }
     public boolean isOngoing(){
         for(Player player : players){

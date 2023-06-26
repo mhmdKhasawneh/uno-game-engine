@@ -1,6 +1,5 @@
 package game;
 
-import cards.BasicEnumCardColor;
 import cards.Card;
 import cards.Deck;
 

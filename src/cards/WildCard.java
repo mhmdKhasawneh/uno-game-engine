@@ -7,6 +7,6 @@ public class WildCard extends AbstractWildCard{
 
     @Override
     public void performAction(Game game) {
-        changeNextPlayableColor(game);
+        game.promptUserToChangeColor();
     }
 }

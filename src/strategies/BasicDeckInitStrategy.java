@@ -5,37 +5,37 @@ import cards.*;
 public class BasicDeckInitStrategy implements DeckInitStrategy{
     @Override
     public void initializeDeck(Deck deck) {
-        for(BasicEnumCardColor color : BasicEnumCardColor.values()){
-            if(color.toString().equals(BasicEnumCardColor.WILD.toString())){
+        for(String color : CardColorsList.getColors()){
+            if(color.equals("WILD")){
                 break;
             }
             int i = 0;
-            for(BasicEnumCardFaceValue value : BasicEnumCardFaceValue.values()){
+            for(String value : CardFaceValuesList.getFaceValues()){
                 if(i == 13){
                     break;
                 }
                 if(i == 0){
-                    addNof(new NumberedCard(color.toString(), value.toString(), i), deck,1);
+                    addNof(new NumberedCard(color, value, i), deck,1);
                 }
                 else if(i >= 10 && i<= 12){
                     if(i == 10){
-                        addNof(new ReverseCard(color.toString(), value.toString()), deck,2);
+                        addNof(new ReverseCard(color, value), deck,2);
                     }
                     else if(i == 11){
-                        addNof(new SkipCard(color.toString(), value.toString()), deck,2);
+                        addNof(new SkipCard(color, value), deck,2);
                     }
                     else{
-                        addNof(new DrawTwoCard(color.toString(), value.toString()), deck,2);
+                        addNof(new DrawTwoCard(color, value), deck,2);
                     }
                 }
                 else{
-                    addNof(new NumberedCard(color.toString(), value.toString(), i), deck,2);
+                    addNof(new NumberedCard(color, value, i), deck,2);
                 }
                 i++;
             }
         }
-            addNof(new WildDrawFourCard(BasicEnumCardColor.WILD.toString(), BasicEnumCardFaceValue.WILD_DRAW_FOUR.toString()), deck,4);
-            addNof(new WildCard(BasicEnumCardColor.WILD.toString(), BasicEnumCardFaceValue.WILD.toString()), deck,4);
+            addNof(new WildDrawFourCard("WILD", "WILD_DRAW_FOUR"), deck,4);
+            addNof(new WildCard("WILD", "WILD"), deck,4);
     }
 
     private void addNof(Card card, Deck deck, int n){
