@@ -1,6 +1,6 @@
 package cards;
 import game.Game;
-public class SkipCard extends AbstractActionCard{
+public final class SkipCard extends AbstractActionCard{
     public SkipCard(String color, String faceValue) {
         super(color, faceValue);
     }

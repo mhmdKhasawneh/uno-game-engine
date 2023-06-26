@@ -2,7 +2,7 @@ package cards;
 import game.*;
 import java.util.Scanner;
 
-public class WildDrawFourCard extends AbstractWildCard implements IPenalty{
+public final class WildDrawFourCard extends AbstractWildCard implements IPenalty{
     public WildDrawFourCard(String color, String faceValue) {
         super(color, faceValue);
     }
