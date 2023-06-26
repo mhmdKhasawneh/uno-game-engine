@@ -35,6 +35,17 @@ public abstract class Game {
         this.players = new ArrayList<>();
         this.discardPile = new ArrayList<>();
         this.currentPlayerIndex = -1;
+        setMinPlayers(2);
+        setDeck(new BasicDeck());
+        setDealerDeterminationStrategy(new BasicDealerDeterminationStrategy());
+        setScoreComputationStrategy(new BasicScoreComputationStrategy());
+        setDeckInitStrategy(new BasicDeckInitStrategy());
+        setDiscardPileInitStrategy(new BasicDiscardPileInitStrategy());
+        setGameDirection("CLOCKWISE");
+        setWinningScore(500);
+        setInitialHandSize(7);
+        setMissedUnoDrawPenalty(2);
+        setNoPlayableCardPenalty(1);
     }
     public final void play() {
         initializePlayers();

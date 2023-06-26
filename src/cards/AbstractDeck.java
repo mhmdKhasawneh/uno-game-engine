@@ -13,6 +13,8 @@ public abstract class AbstractDeck {
 
     public AbstractDeck() {
         deck = new ArrayList<>();
+        deckColors = new ArrayList<>();
+        deckFaceValues = new ArrayList<>();
         deckSize = 0;
     }
 
@@ -71,10 +73,10 @@ public abstract class AbstractDeck {
         return deck;
     }
     public List<String> getColors(){
-        return Collections.unmodifiableList(deckColors);
+        return deckColors;
     }
     public List<String> getFaceValues(){
-        return Collections.unmodifiableList(deckFaceValues);
+        return deckFaceValues;
     }
     public void show(){
         int i=0;
